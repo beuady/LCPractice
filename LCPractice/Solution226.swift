@@ -31,30 +31,30 @@ extension TreeNode: Equatable {
 
 /// https://leetcode-cn.com/problems/invert-binary-tree/
 class Solution226 {
-   func invertTree(_ root: TreeNode?) -> TreeNode? {
-        if root == nil {
-            return nil
-        }
-        var l = invertTree(root?.left)
-        var r = invertTree(root?.right)
-        root?.left = r
-        root?.right = l
-        return root
-    }
-// 方法2
-    func invertTree2(_ root: TreeNode?) -> TreeNode? {
-        if root == nil {
-            return nil
-        }
-        
-        root?.left = r
-        root?.right = l
-        
-        var l = invertTree(root?.left)
-        var r = invertTree(root?.right)
-        
-        return root
-    }
-    
+//   func invertTree(_ root: TreeNode?) -> TreeNode? {
+//        if root == nil {
+//            return nil
+//        }
+//        var l = invertTree(root?.left)
+//        var r = invertTree(root?.right)
+//        root?.left = r
+//        root?.right = l
+//        return root
+//    }
+//// 方法2
+//    func invertTree2(_ root: TreeNode?) -> TreeNode? {
+//        if root == nil {
+//            return nil
+//        }
+//        
+//        root?.left = r
+//        root?.right = l
+//        
+//        var l = invertTree(root?.left)
+//        var r = invertTree(root?.right)
+//        
+//        return root
+//    }
+//    
     
 }

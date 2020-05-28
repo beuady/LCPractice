@@ -12,7 +12,8 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        Solution226().invertTree(nil)
+//        Solution226().invertTree(nil)
+        Solution105().testCase()
     }
     
 
