@@ -93,9 +93,7 @@ class Solution394 {
         }
         
         return false
-    }
-    
-    
+    }        
     
     func isLetter2(_ char:Character) -> Bool {
         let pattern = #"[a-z,A-Z]"#
