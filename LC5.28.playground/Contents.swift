@@ -105,3 +105,66 @@ class Solution394 {
     
 }
 Solution394().decodeString("3[a]2[bc]")
+
+/**
+ * Definition for a binary tree node.
+ * */
+ public class TreeNode {
+      public var val: Int
+      public var left: TreeNode?
+      public var right: TreeNode?
+      public init(_ val: Int) {
+          self.val = val
+          self.left = nil
+         self.right = nil
+      }
+  }
+ 
+/**
+ 主要是识别每次递归中左叶子节点，
+ 关键逻辑就是node.left==nil&&node.right==nil并且来自是上一层的左节点，满足三个条件就是左叶子节点啦~s
+ */
+class Solution404 {
+    func sumOfLeftLeaves(_ root: TreeNode?) -> Int {
+        
+        return helper(root?.left, isLeft: true)+helper(root?.right, isLeft: false)
+    }
+    
+    func helper(_ node:TreeNode?,isLeft:Bool) -> Int {
+        if node == nil {
+            return 0
+        }
+        
+        if isLeft==true {
+            if node?.left == nil && node?.right == nil {
+                return node!.val
+            }
+        }
+        return helper(node?.left, isLeft: true)+helper(node?.right, isLeft: false)
+    }
+}
+
+
+class Solution257 {
+    var routes = [String]()
+    func binaryTreePaths(_ root: TreeNode?) -> [String] {
+        helper(root, path: "")
+        return routes
+    }
+    
+    func helper(_ node:TreeNode?, path:String ) {
+        var path = path
+        if node != nil {
+            path += String( node!.val)
+            if node?.left==nil && node?.right==nil {
+                routes.append(path)
+            }else{
+                path += "->"
+                helper(node?.left, path: path)
+                helper(node?.right, path: path)
+            }
+        }
+    }
+    
+    
+}
