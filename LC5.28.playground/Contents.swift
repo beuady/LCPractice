@@ -8,7 +8,27 @@ import Foundation
 //for i in stride(from: 0, through: 5, by: 1){
 //    print(i)
 //}
+
+//let sets = Set<Int>([1,4,3,3,2,1])
+//for num in sets.sorted(){//Set是不会自动排序的
+//    print(num)
+//}
+
 /**
+ 128. 最长连续序列
+ 给定一个未排序的整数数组，找出最长连续序列的长度。
+ 
+ 要求算法的时间复杂度为 O(n)。
+ 示例:
+
+ 输入: [100, 4, 200, 1, 3, 2]
+ 输出: 4
+ 解释: 最长连续序列是 [1, 2, 3, 4]。它的长度为 4。
+
+ 来源：力扣（LeetCode）
+ 链接：https://leetcode-cn.com/problems/longest-consecutive-sequence
+ 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+ 
  学习总结:
  1.一定要优先注意边界，包括起始边界，还有终点边界
  2.关注算法性能问题,如果发现O(n^2)基本上是不会pass的解法。
@@ -16,6 +36,31 @@ import Foundation
  4.一旦产出思考逻辑过渡复杂的时候，其实极大可能思路是错误的。要学会不断评估已有算法的逻辑是否清晰和简明
  */
 class Solution {
+    
+    func longestConsecutive2(_ nums: [Int]) -> Int {
+        if nums.count < 2 {
+            return nums.count
+        }
+        
+        let sets = Set<Int>(nums)
+        var curRes = 1
+        var res = 1
+        for num in sets {
+            var curNum = num
+            if !sets.contains(num-1) {
+                curRes = 1
+                
+                while(sets.contains(curNum+1)){
+                    curNum += 1
+                    curRes += 1
+                }
+                
+                res = max(res, curRes)
+            }
+        }
+        return res
+    }
+    
     func longestConsecutive(_ nums: [Int]) -> Int {
         if nums.count < 2 {
             return nums.count
