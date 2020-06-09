@@ -14,6 +14,165 @@ import Foundation
 //    print(num)
 //}
 
+let str:Character = "a"
+let str2:Character = "B"
+
+str.asciiValue
+str2.asciiValue
+
+let num = 123
+var nums = Array(String(num))
+
+"258".compare("25", options: .literal, range: nil, locale: nil).rawValue
+
+
+/**
+ 设第i-1位和第i位形成数字x,
+ f(i) = f(i-1)+f(i-2), [i-1>=0, 10<=x<=25]
+ 边界条件:
+    
+ */
+class Solution46 {
+        func translateNum(_ num: Int) -> Int {
+            var dp = [Int](repeating: 0, count: 3) //滚动数组
+            dp[0] = 0
+            dp[1] = 1
+            dp[2] = 1
+            let nums = Array(String(num))
+            
+            if nums.count < 2 {
+                return 1
+            }
+            for i in 1..<nums.count {
+                dp[0] = dp[1]
+                dp[1] = dp[2]
+                
+                dp[2] = 0
+                dp[2] += dp[1]
+                
+                let sub = Int("\(nums[i-1])\(nums[i])")!
+
+                if sub<=25 && sub>=10 {
+                    dp[2] = dp[0] + dp[1]
+                }
+                            
+            }
+            return dp[2]
+        }
+    
+    // 失败的思路
+    func translateNumFail(_ num: Int) -> Int {
+
+        var solution = 1 // 一个一个翻译的情况默认是第一个种解
+        
+        // calculate length of num
+        var len:UInt = UInt(num)
+        var n = 0
+        while len != 0 {
+            len /= 10
+            n += 1
+        }
+        
+        //寻找其余两个两个一组的解法的可能性
+        var window:UInt = UInt(num)
+        for _ in 0 ..< n {
+            let aWindow = window % 100
+            if (10...25).contains(aWindow) {
+                solution += 1
+            }
+            window /= 10
+        }
+        return solution
+    }
+
+    
+    func testCase() {
+//        translateNum(12258) == 5
+        translateNum(25) == 2
+//        translateNum(18822) == 4
+    }
+}
+
+Solution46().testCase()
+
+
+/**
+ 学习总结:
+ 请务必看官方解读视频。并查集的时间复杂度是平均时间下O(1),但实际时间是很难计算的。并查集disjoin-set有两种方式，
+ 1）按秩合并
+    是指在合并过程中，使得【高度】更低的树的根结点指向【高度】更高的根结点，以避免合并后的树高度增加
+ 2) 路径压缩(度数最小)
+    2.1完全压缩（递归)
+    2.2隔代压缩 (相对完全压缩性能更好)
+ 
+ 990. 等式方程的可满足性
+ 给定一个由表示变量之间关系的字符串方程组成的数组，每个字符串方程 equations[i] 的长度为 4，并采用两种不同的形式之一："a==b" 或 "a!=b"。在这里，a 和 b 是小写字母（不一定不同），表示单字母变量名。
+
+ 只有当可以将整数分配给变量名，以便满足所有给定的方程时才返回 true，否则返回 false。
+
+  
+
+ 示例 1：
+
+ 输入：["a==b","b!=a"]
+ 输出：false
+ 解释：如果我们指定，a = 1 且 b = 1，那么可以满足第一个方程，但无法满足第二个方程。没有办法分配变量同时满足这两个方程。
+
+
+ 来源：力扣（LeetCode）
+ 链接：https://leetcode-cn.com/problems/satisfiability-of-equality-equations
+ 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+ */
+class Solution990 {
+    func equationsPossible(_ equations: [String]) -> Bool {
+        var parent = [UInt8](repeating: 0, count: 26)
+        for i in 0..<26{
+            parent[i] = UInt8(i)
+        }
+        
+        for str in equations {
+            let chars:[Character] = Array(str)
+            if chars[1] == "=" {
+                let index1 = chars[0].asciiValue! - Character("a").asciiValue!
+                let index2 = chars[3].asciiValue! - Character("a").asciiValue!
+                union(&parent, index1, index2)
+            }
+        }
+        
+        for str in equations {
+            let chars:[Character] = Array(str)
+            if chars[1] == "!" {
+                let index1 = chars[0].asciiValue! - Character("a").asciiValue!
+                let index2 = chars[3].asciiValue! - Character("a").asciiValue!
+                if find(&parent, index1) == find(&parent, index2) {
+                    return false
+                }
+            }
+        }
+        
+        return true
+    }
+    
+    func union(_ parent:inout [UInt8], _ index1:UInt8, _ index2:UInt8) {
+        parent[Int(find(&parent, index1))] = find(&parent, index2)
+    }
+    
+    func find(_ parent:inout [UInt8], _ index8:UInt8) -> UInt8 {
+        var index:Int = Int(index8)
+        while parent[index] != index {
+            parent[index] = parent[Int(parent[index])]
+            index = Int(parent[index])
+        }
+        return UInt8(index)
+    }
+    
+    func testCase(){
+        equationsPossible(["a==b","b!=a"]) == false
+    }
+}
+
+Solution().testCase()
+
 /**
  128. 最长连续序列
  给定一个未排序的整数数组，找出最长连续序列的长度。
