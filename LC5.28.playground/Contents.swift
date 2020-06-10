@@ -26,6 +26,58 @@ var nums = Array(String(num))
 "258".compare("25", options: .literal, range: nil, locale: nil).rawValue
 
 
+public class TreeNode {
+    public var val: Int
+    public var left: TreeNode?
+    public var right: TreeNode?
+    public init(_ val: Int) {
+        self.val = val
+        self.left = nil
+        self.right = nil
+    }
+}
+
+extension TreeNode : Equatable {
+    public static func == (lhs: TreeNode, rhs: TreeNode) -> Bool {
+        return lhs==rhs
+    }
+}
+
+class Solution {
+    /**
+     解法1:
+     情况1，  p是q的祖先,  helper(p)是否含有q
+     情况2,   q是p的祖先，helper(q)是否含有p
+     情况3,  q和p存在非自身的公共祖先
+            helper'(root)是否含有q和p,继续找直到helper'(root)都含有q和p,并且下一个helper'(root.left)等于q|p或者helper'(root.right)等于q|p.这时候的root就是目标祖先
+     
+     解法2:
+        找到p的所有祖先的结点N。假设p是公共祖先，从p出发向下找q，如果找到q就是祖先，找不到，就找上一个祖先，再重复以假设的祖先结点，向下遍历找到q，则这个祖先N'就是目标值
+     
+     官方解法:
+        因为这个是搜索树，是有顺序的。就可以通过递归，加入p、q的值都比根结点root大，p和q就在root.right为根结点root'的子树里面， 就递归寻找root.right里。
+        如果p和q都比root.val小，肯定都在root.left为根结点root'的子树里面。直到都不在左子树或右子树，迭代到当前的root结点就是最近祖先
+     */
+    func lowestCommonAncestor(_ root: TreeNode?, _ p: TreeNode?, _ q: TreeNode?) -> TreeNode? {
+        if root == nil || p == nil || q == nil {
+            return nil
+        }
+        let rVal = root!.val
+        let pVal = p!.val
+        let qVal = q!.val
+
+        if rVal < pVal && rVal < qVal {
+            return lowestCommonAncestor(root?.right, p, q)
+        }else if rVal > pVal && rVal > qVal {
+            return lowestCommonAncestor(root?.left, p, q)
+        }else{
+            return root
+        }
+
+    }
+    
+}
+
 /**
  设第i-1位和第i位形成数字x,
  f(i) = f(i-1)+f(i-2), [i-1>=0, 10<=x<=25]
@@ -458,16 +510,16 @@ Solution394().decodeString("3[a]2[bc]")
 /**
  * Definition for a binary tree node.
  * */
- public class TreeNode {
-      public var val: Int
-      public var left: TreeNode?
-      public var right: TreeNode?
-      public init(_ val: Int) {
-          self.val = val
-          self.left = nil
-         self.right = nil
-      }
-  }
+// public class TreeNode {
+//      public var val: Int
+//      public var left: TreeNode?
+//      public var right: TreeNode?
+//      public init(_ val: Int) {
+//          self.val = val
+//          self.left = nil
+//         self.right = nil
+//      }
+//  }
  
 /**
  主要是识别每次递归中左叶子节点，
