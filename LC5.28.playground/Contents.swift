@@ -43,7 +43,10 @@ extension TreeNode : Equatable {
     }
 }
 
-class Solution {
+/**
+ 235. 二叉搜索树的最近公共祖先
+ */
+class Solution235 {
     /**
      解法1:
      情况1，  p是q的祖先,  helper(p)是否含有q
