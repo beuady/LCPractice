@@ -2,9 +2,276 @@ import UIKit
 
 var str = "Hello, playground"
 
-let list = [5,4,3,2,1]
-let n = list.firstIndex(of: 1)
-type(of: n)
+//let list = [5,4,3,2,1]
+//let n = list.firstIndex(of: 1)
+//type(of: n)
+
+
+/**
+ 三数之和
+ */
+class Solution15 {
+    func threeSum(_ nums: [Int]) -> [[Int]] {
+        let sorts = nums.sorted()
+        var res = [[Int]]()
+        for i in 0..<sorts.count {
+            if i>0 && sorts[i] == sorts[i - 1] {//3元组的第一个元素不重复提取
+                continue
+            }
+            let target = -sorts[i]
+            var j = i+1
+            var k = sorts.count - 1
+            // 双指针, 还要充分利用排序数组的优势，是让j继续去重搜索，还是用k,用排序数组的尾巴反向搜索。这两种都是充分利用排序的优势，提高搜索性能
+            while j < k {
+                let sum = sorts[j] + sorts[k]
+                if sum == target {
+                    res.append([sorts[i], sorts[j],sorts[k]])
+                    while j<k && sorts[j] == sorts[j+1] {
+                        j += 1
+                    }
+                    while j<k && sorts[k] == sorts[k-1] {
+                        k -= 1
+                    }
+                    j += 1
+                    k -= 1
+                }else if sum < target {
+                    j += 1
+                }else{
+                    k -= 1
+                }
+                
+            }
+           
+        }
+        print(res)
+        return res
+    }
+    /**
+    测试结果：292 / 313 个通过测试用例， 花了那么多时间大约1h+，虽然不是最终答案，但是学会了如下内容：
+     1）迭代算法，发现子问题。当前子问题是暴力求解过程中，得到了大量重复的三元组集合。如果暴力去重，时间复杂度只可能是O(n^3)，
+     所以子问题就是如何有效得到不重复的集合。
+     2)以上是暴力求解过程的思路，强调自身不要否认这些不是最优或者符合时间范围内解决的方案。基于暴力（常规）思维再进行改进和革新，这就是一个自我提高的过程。
+     但也不要夸大其意义。从粗略的方案到合理的方案之间，总是有很大的鸿沟，要善于发掘问题的关键点。
+     3)以后暴力求解应该在规定时间内停止，因为很有可能花费大量的时间在错误的思路上。
+     */
+    func threeSum_timeout(_ nums: [Int]) -> [[Int]] {
+        if nums.count < 3 {
+            return [[Int]]()
+        }
+        var map = [Int:Int]()
+        for i in 0..<nums.count {
+            if let z = map[nums[i]]{
+                map[nums[i]] = z + 1
+            }else{
+                map[nums[i]] = 1
+            }
+        }
+        
+        var res = [[Int]]()
+        var a = 0, b = 0, c = 0
+        for i in 0..<nums.count {
+            a = nums[i]
+            for j in i+1..<nums.count{
+                b = nums[j]
+                
+                let num3 = 0 - (a + b)
+                if let _ = map[num3] {
+                    c = num3
+                    
+                    var tmpMap = [Int:Int]()
+                    tmpMap[a] = 1
+                    if let _ = tmpMap[b]{
+                        tmpMap[b]! += 1
+                    }else{
+                        tmpMap[b] = 1
+                    }
+                    
+                    if let _ = tmpMap[c]{
+                        tmpMap[c]! += 1
+                    }else{
+                        tmpMap[c] = 1
+                    }
+                    
+                    if tmpMap[a]! <= map[a]! &&
+                        tmpMap[b]! <= map[b]! &&
+                        tmpMap[c]! <= map[c]! {
+                        let sorted = [a,b,c].sorted()
+                        var has = false
+                        for list in res {
+                            if list[0] == sorted[0] && list[1] == sorted[1] && list[2] == sorted[2] {
+                                has = true
+                                break
+                            }
+                        }
+                        if !has {
+                            res.append(sorted)
+                        }
+                    }
+
+                }
+                
+            }
+        }
+//        print(res)
+        return res
+    }
+    
+    func testCase() {
+        threeSum([-1, 0, 1, 2, -1, -4]) == [
+          [-1, 0, 1],
+          [-1, -1, 2]
+        ]
+//        threeSum([0,1,1])
+//        threeSum([0,0,0,0])
+    }
+    
+}
+
+Solution15().testCase()
+
+public class TreeNode {
+    public var val: Int
+    public var left: TreeNode?
+    public var right: TreeNode?
+    public init(_ val: Int) {
+        self.val = val
+        self.left = nil
+        self.right = nil
+    }
+}
+
+//Definition for singly-linked list.
+public class ListNode {
+    public var val: Int
+    public var next: ListNode?
+    public init(_ val: Int) {
+        self.val = val
+        self.next = nil
+    }
+}
+
+/**
+ 关于树的几个基础问题
+ */
+class Solution {
+    // 最大深度
+    func maxDepth(_ root: TreeNode?) -> Int {
+        if root == nil {
+            return 0
+        }
+        if root?.left == nil && root?.right == nil {
+            return 1
+        }else if root?.left != nil && root?.right == nil{
+            return 1 + maxDepth(root?.left)
+        }else if root?.right != nil && root?.left == nil {
+            return 1 + maxDepth(root?.right)
+        }else{
+            return 1 + maxDepth(root?.left)+maxDepth(root?.right)
+        }
+    }
+    
+    //验证二叉搜索树
+    func isValidBST(_ root: TreeNode?) -> Bool {
+        
+        return helper(root, Int.min, Int.max)
+    }
+    
+    func helper(_ root:TreeNode?, _ left:Int,_ right:Int)->Bool {
+        if root == nil {
+            return true
+        }
+        
+        if root!.val <= left || root!.val >= right {
+            return false
+        }
+        return helper(root?.left, left, root!.val) && helper(root?.right, root!.val, right)
+    }
+    
+    // 对称二叉树
+    func isSymmetric(_ root: TreeNode?) -> Bool {
+        if root == nil {
+            return true
+        }
+        
+        var left = root?.left
+        var right = root?.right
+        var rs = left?.val == right?.val
+        return rs && isMirror(left?.left,right?.right) && isMirror(left?.right, right?.left)
+    }
+    
+    func isMirror(_ left:TreeNode?, _ right:TreeNode?) -> Bool {
+        if left == nil && right == nil {
+            return true
+        }else if left != nil && right != nil {
+            let rs = left!.val == right!.val
+            return rs && isMirror(left?.left,right?.right) && isMirror(left?.right, right?.left)
+        }else{
+            return false
+        }
+    }
+    
+    func levelOrder(_ root: TreeNode?) -> [[Int]] {
+        var res = [[Int]]()
+        if root == nil {
+            return res
+        }
+        var queue = [TreeNode]()
+        queue.append(root!)
+        
+        while queue.count != 0 {
+            let n = queue.count
+            var list = [Int]()
+            for _ in 0 ..< n {
+                let node = queue.removeFirst()
+                list.append(node.val)
+                if let lnode = node.left {
+                    queue.append(lnode)
+                }
+                if let rnode = node.right {
+                    queue.append(rnode)
+                }
+            }
+            res.append(list)
+        }
+        return res
+    }
+    
+    // 将有序数组转换为二叉搜索树
+    func sortedArrayToBST(_ nums: [Int]) -> TreeNode? {
+        return helper2(nums, 0, nums.count)
+    }
+    
+    func helper2(_ nums:[Int],_ start:Int,_ end:Int) -> TreeNode? {
+        if start >= end {
+            return nil
+        }
+        
+        var center:Int = start + (end - start)/2
+        if (end - start) % 2 == 1 {
+            center += 1
+        }
+        
+        let node = TreeNode(nums[center])
+        node.left = helper2(nums, 0, center-1)
+        node.right = helper2(nums, center+1, end)
+        return node
+    }
+}
+
+class Solution141 {
+    func hasCycle(_ head: ListNode?) -> Bool {
+        var fast:ListNode? = head?.next
+        var slow:ListNode? = head
+        while fast !== slow {
+            if fast?.next == nil || fast == nil {
+                return false
+            }
+            fast = fast?.next?.next
+            slow = slow?.next
+        }
+        return true
+    }
+}
 
 /**
  根据每日 气温 列表，请重新生成一个列表，对应位置的输出是需要再等待多久温度才会升高超过该日的天数。如果之后都不会升高，请在该位置用 0 来代替。
