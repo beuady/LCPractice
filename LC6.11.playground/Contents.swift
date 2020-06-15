@@ -8,6 +8,220 @@ var str = "Hello, playground"
 
 
 /**
+ 最长公共前缀
+ */
+class Solution14 {
+    func longestCommonPrefix(_ strs: [String]) -> String {
+        var res = ""
+        if strs.count == 0 {
+            return res
+        }
+        let amin = strs.min()!.count
+        for i in 0...amin {
+            var r:String? = nil
+            var isPre = true
+            for str in strs {
+                if r == nil {
+                    r = String(str.prefix(i+1))
+//                    print(r, "..")
+                }else{
+//                    print(r, String(str.prefix(i+1)))
+                    if r == String(str.prefix(i+1)) {
+                        
+                    }else{
+                        isPre = false
+                    }
+                }
+            }
+            if isPre {
+                res = r!
+            }
+        }
+        return res
+    }
+    
+    func test() {
+        longestCommonPrefix(["","b"]) == ""
+    }
+}
+Solution14().test()
+
+/**
+ 1300. 转变数组后最接近目标值的数组和
+ 给你一个整数数组 arr 和一个目标值 target ，请你返回一个整数 value ，使得将数组中所有大于 value 的值变成 value 后，数组的和最接近  target （最接近表示两者之差的绝对值最小）。
+
+ 如果有多种使得和最接近 target 的方案，请你返回这些整数中的最小值。
+
+ 请注意，答案不一定是 arr 中的数字。
+
+ */
+class Solution1300 {
+    func findBestValue(_ arr: [Int], _ target: Int) -> Int {
+        let avg:Int = target / arr.count
+        let amax = arr.max()!
+//        var amin = arr.min()!
+        // 双指针滑动
+        var pr_l = avg, pr_r = avg
+        var res = target
+        var lastAbsValue = Int.max
+        while pr_l >= 1 || pr_r <= amax {
+            let recentAbs = calTarget(arr, pr_l,target)
+            if pr_l >= 1 && recentAbs < lastAbsValue {
+                lastAbsValue = recentAbs
+                res = pr_l
+                print(lastAbsValue, pr_l, "left")
+            }
+            pr_l -= 1
+            let recentAbs2 = calTarget(arr, pr_r, target)
+            if pr_r <= amax && recentAbs2 < lastAbsValue {
+                lastAbsValue = recentAbs2
+                res = pr_r
+                print(lastAbsValue, pr_r, "right")
+            }
+            pr_r += 1
+            
+//            print("break",recentAbs, recentAbs2, lastAbsValue)
+            if recentAbs > lastAbsValue && recentAbs2 > lastAbsValue {
+                break
+            }
+
+            
+            
+            if lastAbsValue == 0 {
+                break
+            }
+        }
+        
+        return res
+    }
+    
+    func calTarget(_ arr:[Int], _ value:Int,_ target:Int) -> Int {
+        var sum = 0
+        for num in arr {
+            sum += num > value ? value : num
+        }
+        return abs(sum-target)
+    }
+    
+    func test() {
+//        findBestValue([60864,25176,27249,21296,20204], 56803) == 11361
+//        findBestValue([1547,83230,57084,93444,70879], 71237) == 17422
+        findBestValue([4,9,3], 10)==3
+//        findBestValue([2,3,5], 10) == 5
+    }
+}
+
+Solution1300().test()
+
+class Solution217 {
+    // 存在重复的元素
+    func containsDuplicate(_ nums: [Int]) -> Bool {
+        let sorted = nums.sorted()
+        for i in 1..<sorted.count {
+            if sorted[i] == sorted[i-1]{
+                return true
+            }
+        }
+        return false
+    }
+    
+    /**LC
+     给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+
+     说明：
+
+     你的算法应该具有线性时间复杂度。 你可以不使用额外空间来实现吗？
+     */
+    //只出现一次的数字
+    func singleNumber(_ nums: [Int]) -> Int {
+        var res = 0
+        for num in nums {
+            res ^= num
+        }
+        return res
+    }
+    
+    /**LC66 加一
+     给定一个由整数组成的非空数组所表示的非负整数，在该数的基础上加一。
+
+     最高位数字存放在数组的首位， 数组中每个元素只存储单个数字。
+
+     你可以假设除了整数 0 之外，这个整数不会以零开头。
+     */
+    func plusOne(_ digits: [Int]) -> [Int] {
+        var nums = [Int](repeating: 0, count: digits.count)
+        var up = 0
+        for i in (0..<digits.count).reversed() {
+            if i == digits.count - 1{
+                nums[i] = (digits[i]+1)%10
+                up = digits[i] == 9 ? 1 : 0
+            }else{
+                nums[i] = (digits[i]+up)%10
+                up = (digits[i]+up) == 10 ? 1 : 0
+            }
+        }
+        if up == 1 {
+            nums.insert(1, at: 0)
+        }
+        return nums
+    }
+}
+class Solution26 {
+    func removeDuplicates(_ nums: inout [Int]) -> Int {
+        for i in (0..<nums.count).reversed() {
+            if i>=1 &&  nums[i] == nums[i-1] {
+                nums.remove(at: i)
+            }
+        }
+        return nums.count
+    }
+}
+
+/**
+ 70. 爬楼梯
+ 
+ f(n) = f(n-1) + f(n-2), f(n)只能从走一步f(n-1)或者走两步f(n-2)达到f(n)，那么f(n)的方案数就是前者的公式,
+   p q r
+ f(0) = 0
+ f(1) = 1
+ f(2) = 2
+ f(3) = f(2) + f(1) = 3
+ f(4) = f(3) + f(2) = 3 + 2
+ */
+class Solution70 {
+    // 递归
+    var memo:[Int]!
+    func climbStairs(_ n: Int) -> Int {
+        if memo == nil {
+            memo = [Int](repeating: 0, count: n+1)
+        }
+        if memo[n]>0 {
+            return memo[n]
+        }
+        if n < 3 {
+            memo[n] = n
+            return n
+        }
+        memo[n] = climbStairs(n-1) + climbStairs(n-2)
+        return memo[n]
+    }
+    
+    // 动态规划
+    func climbStairs_dp(_ n: Int) -> Int {
+        var dp = [Int](repeating: 0, count: 3)
+        dp[2] = 1
+        for _ in 1...n {
+            dp[0] = dp[1]
+            dp[1] = dp[2]
+            dp[2] = dp[0] + dp[1]
+            print(dp)
+        }
+        return dp[2]
+    }
+}
+Solution70().climbStairs(4) == 5
+
+/**
  三数之和
  */
 class Solution15 {
