@@ -6,12 +6,257 @@ var str = "Hello, playground"
 //let n = list.firstIndex(of: 1)
 //type(of: n)
 
+var list = [Int?]()
+list = [1,2,nil,0]
+
+
+public class TreeNode {
+    public var val: Int
+    public var left: TreeNode?
+    public var right: TreeNode?
+    public init(_ val: Int) {
+        self.val = val
+        self.left = nil
+        self.right = nil
+    }
+}
+
+//Definition for singly-linked list.
+public class ListNode {
+    public var val: Int
+    public var next: ListNode?
+    public init(_ val: Int) {
+        self.val = val
+        self.next = nil
+    }
+}
+
+/**
+ 297 hard,二叉树的序列化与反序列化 序列化是将一个数据结构或者对象转换为连续的比特位的操作，进而可以将转换后的数据存储在一个文件或者内存中，同时也可以通过网络传输到另一个计算机环境，采取相反方式重构得到原数据。
+
+ 请设计一个算法来实现二叉树的序列化与反序列化。这里不限定你的序列 / 反序列化算法执行逻辑，你只需要保证一个二叉树可以被序列化为一个字符串并且将这个字符串反序列化为原始的树结构。
+
+ 来源：力扣（LeetCode）
+ 链接：https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree
+ 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+ */
+
+
+class Codec {
+    func serialize(_ root: TreeNode?) -> String {
+        var tmp = _serialize(root, "")
+        tmp = String(tmp.prefix(tmp.count-1))
+        return "[\(tmp)]"
+    }
+    
+    func deserialize(_ data: String) -> TreeNode? {
+        let adata = data[(data.index(after: data.startIndex))..<(data.index(before: data.endIndex))]
+        var list = adata.split(separator: ",")
+//        print(list)
+        return _deserialize(&list)
+
+    }
+    func _serialize(_ root: TreeNode?, _ str:String) -> String {
+        var str = str
+        if root == nil {
+            str += "null,"
+        }else{
+            str += "\(root!.val),"
+            str = _serialize(root?.left, str)
+            str = _serialize(root?.right, str)
+        }
+        return str
+    }
+    
+    func _deserialize(_ list:inout [Substring]) -> TreeNode?{
+        guard list.count != 0 else {
+            return nil
+        }
+        let str = list.remove(at: 0)
+//        print(str)
+        if str == "null" {
+            return nil
+        }else{
+            let node = TreeNode(Int(String(str))!)
+            node.left = _deserialize(&list)
+            node.right = _deserialize(&list)
+            return node
+        }
+    }
+    
+}
+
+ var codec = Codec()
+let node = codec.deserialize("[1,2,3,null,null,4,5]")
+codec.serialize(node) == "[1,2,3,null,null,4,5]"
+
+
+class Codec_Fail_序列化失败 {
+    func serialize(_ root: TreeNode?) -> String {
+        var data = ""
+        
+        var queue = [TreeNode?]()
+        if let node = root {
+            queue.append(node)
+        }
+        
+        while queue.count != 0 {
+            let n = queue.count
+            
+            var isAllNil = true
+            for node in queue {
+                if node != nil {
+                    isAllNil = false
+                    break
+                }
+                
+            }
+                        
+            if isAllNil {
+                break
+            }
+            
+            for _ in 0 ..< n {
+                let node = queue.removeFirst()
+                if node != nil {
+                    queue.append(node?.left)
+                    queue.append(node?.right)
+                    data += "\(node!.val),"
+                }else{
+//                    print("null")
+                    data += "null,"
+
+                }
+            }
+//            print(queue)
+        }
+        
+        
+        return "[\(data[..<(data.index(before: data.endIndex))])]"
+    }
+    
+    /**
+     思路: 通过画图可知， 对于第i个结点，f(i) = left,left表示左孩纸在整颗树的索引,
+     而这个左孩子的父节点的索引一定是 p(i) = left/2,
+     */
+    func deserialize(_ data: String) -> TreeNode? {
+        let adata = data[(data.index(after: data.startIndex))..<(data.index(before: data.endIndex))]
+        let list = adata.split(separator: ",")
+        var queue = [TreeNode?]() //statck
+
+        for i in 0..<list.count {
+            let str = list[i]
+            if str == "null" {
+                queue.append(nil)
+            }else{
+
+                let val = Int(String(str))!
+                let node = TreeNode(val)
+                queue.append(node)
+            }
+        }
+
+        var level = 1
+        for i in 0..<queue.count {
+            let index = i+1
+           
+            if index <= level && index != 1 {
+                if index % 2 == 0 {//左孩子
+                    let pIndex:Int = index/2
+                    print("pIndex", pIndex)
+                    print(index, index+1)
+                    
+                    let parent = queue[pIndex]
+                    parent?.left = queue[index]
+                    parent?.right = queue[index+1]
+                }
+            }else{
+                level *= 2
+            }
+        }
+        return queue.first!
+    }
+}
+
+// Your Codec object will be instantiated and called as such:
+//var node = TreeNode(1)
+//node.left = TreeNode(2)
+//node.right = TreeNode(3)
+//node.right?.left = TreeNode(4)
+//node.right?.right = TreeNode(5)
+
+/**
+ 两个数组的交集 II
+ */
+class Solution {
+    func intersect(_ nums1: [Int], _ nums2: [Int]) -> [Int] {
+        if nums1.count > nums2.count {
+            return intersect(nums2, nums1)
+        }
+        // nums1长度最小
+        var res:[Int] = [Int]()
+        
+        let nnums2 = nums2.sorted()
+        let nnums1 = nums1.sorted()
+
+        for i in 0..<nnums2.count {
+            var ares = [Int]()
+            for j in 0..<nnums1.count {
+                
+                if i+j < nnums2.count && nnums1[j] == nnums2[i+j] {
+                    ares.append(nnums1[j])
+                    print(ares)
+                }
+            }
+            res = ares.count > res.count ? ares : res
+        }
+        
+        return res
+    }
+    
+    func test() {
+        intersect([1,2,2,1], [2,2]) == [2,2]
+        intersect([4,9,5], [9,4,9,8,4]) == [4,9]
+        intersect([2,1], [1,2]) == [1,2]
+        intersect([3,1,2], [1,3]) == [1,3]
+    }
+}
+Solution().test()
+
+/**
+ 移动零
+ */
+class Solution283 {
+    func moveZeroes(_ nums: inout [Int]) {
+        var n = 0
+        for i in 0..<nums.count {
+            if nums[i] != 0 {
+                nums.swapAt(n, i)
+                n += 1
+            }
+        }
+    }
+    func test(){
+        var t = [0,1,0,3,12]
+        moveZeroes(&t)
+        t
+    }
+}
+Solution283().test()
 
 /**
  最长公共前缀
  */
 class Solution14 {
+    // 分治法
     func longestCommonPrefix(_ strs: [String]) -> String {
+        var res = ""
+        
+        
+        
+        return res
+    }
+    func longestCommonPrefix_横向解法(_ strs: [String]) -> String {
         var res = ""
         if strs.count == 0 {
             return res
@@ -343,26 +588,7 @@ class Solution15 {
 
 Solution15().testCase()
 
-public class TreeNode {
-    public var val: Int
-    public var left: TreeNode?
-    public var right: TreeNode?
-    public init(_ val: Int) {
-        self.val = val
-        self.left = nil
-        self.right = nil
-    }
-}
 
-//Definition for singly-linked list.
-public class ListNode {
-    public var val: Int
-    public var next: ListNode?
-    public init(_ val: Int) {
-        self.val = val
-        self.next = nil
-    }
-}
 
 /**
  关于树的几个基础问题
