@@ -6,8 +6,20 @@ var str = "Hello, playground"
 //let n = list.firstIndex(of: 1)
 //type(of: n)
 
+let a:Character = "a"
+a.asciiValue
+Character("z").asciiValue
+Character("1").asciiValue
+Character("9").asciiValue
+Character("0").asciiValue
+
 var list = [Int?]()
 list = [1,2,nil,0]
+
+//快速创建计数字典
+let alist = [1,2,2,1]
+let blist = alist.map { ($0, 1)}
+var numsFreq = Dictionary(blist, uniquingKeysWith: +)
 
 
 public class TreeNode {
@@ -30,6 +42,312 @@ public class ListNode {
         self.next = nil
     }
 }
+
+/**
+   整数反转
+ */
+class Solution7 {
+    func reverse(_ x: Int) -> Int {
+        var num = x
+        var res = 0
+        while num != 0 {
+            let tmp = res&*10 + num%10 //临时增量后的值
+            if tmp > Int32.max || tmp < Int32.min{//判断增量后的值是否能还原成原来的res值
+                return 0
+            }
+            res = tmp        
+            num /= 10
+        }
+        return res
+    }
+    func reverse_char_method(_ x: Int) -> Int {
+        let str = String(x)
+        let strs = Array(str)
+        var res = [Character]()
+        var isMinus = false
+        for str in strs {
+            if str == "-" {
+                isMinus = true
+            }else{
+                res.insert(str, at: 0)
+            }
+        }
+        var result = 0
+        for num in res {
+            result = result &* 10 &+ Int(String(num))!
+        }
+        
+        if result > INT32_MAX {
+            return 0
+        }
+        
+        return isMinus ? -result : result
+    }
+    
+    func test(){
+        reverse(1534236469) == 0
+    }
+}
+Solution7().test()
+
+/**
+ 验证回文串
+ 给定一个字符串，验证它是否是回文串，只考虑字母和数字字符，可以忽略字母的大小写。
+
+ 说明：本题中，我们将空字符串定义为有效的回文串。
+
+ 示例 1:
+
+ 输入: "A man, a plan, a canal: Panama"
+ 输出: true
+
+ 来源：力扣（LeetCode）
+ 链接：https://leetcode-cn.com/problems/valid-palindrome
+ 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+ */
+class Solution125 {
+    func isPalindrome(_ s: String) -> Bool {
+
+        let str = Array(s.lowercased())
+        var i=0
+        var res = [Character]()
+        while i<str.count {
+            let a = str[i]
+            if ((a.isASCII && Character("a").asciiValue! <= a.asciiValue! && a.asciiValue! <= Character("z").asciiValue!) ||
+                (a.isASCII && Character("0").asciiValue! <= a.asciiValue! && a.asciiValue! <= Character("9").asciiValue!))
+                {
+                    res.append(a)
+            }
+            i += 1
+        }
+        
+        i = 0
+        var j=res.count - 1
+        while i<j {
+            if res[i] != res[j] {
+                return false
+            }
+            i += 1
+            j -= 1
+        }
+        
+        return true
+    }
+    
+    func test() {
+        isPalindrome("A man, a plan, a canal: Panama")
+        isPalindrome("race a car")
+    }
+    
+}
+
+Solution125().test()
+
+/**
+ 从先序遍历还原二叉树 hard
+ 我们从二叉树的根节点 root 开始进行深度优先搜索。
+
+ 在遍历中的每个节点处，我们输出 D 条短划线（其中 D 是该节点的深度），然后输出该节点的值。（如果节点的深度为 D，则其直接子节点的深度为 D + 1。根节点的深度为 0）。
+
+ 如果节点只有一个子节点，那么保证该子节点为左子节点。
+
+ 给出遍历输出 S，还原树并返回其根节点 root。
+ 
+ 输入："1-2--3--4-5--6--7"
+ 输出：[1,2,5,3,4,6,7]
+
+ 来源：力扣（LeetCode）
+ 链接：https://leetcode-cn.com/problems/recover-a-tree-from-preorder-traversal
+ 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+ class Solution {
+ public:
+     TreeNode* recoverFromPreorder(string S) {
+         stack<TreeNode*> path;
+         int pos = 0;
+         while (pos < S.size()) {
+             int level = 0;
+             while (S[pos] == '-') {
+                 ++level;
+                 ++pos;
+             }
+             int value = 0;
+             while (pos < S.size() && isdigit(S[pos])) {
+                 value = value * 10 + (S[pos] - '0');
+                 ++pos;
+             }
+             TreeNode* node = new TreeNode(value);
+             if (level == path.size()) {
+                 if (!path.empty()) {
+                     path.top()->left = node;
+                 }
+             }
+             else {
+                 while (level != path.size()) {
+                     path.pop();
+                 }
+                 path.top()->right = node;
+             }
+             path.push(node);
+         }
+         while (path.size() > 1) {
+             path.pop();
+         }
+         return path.top();
+     }
+ };
+ 
+
+ 作者：LeetCode-Solution
+ 链接：https://leetcode-cn.com/problems/recover-a-tree-from-preorder-traversal/solution/cong-xian-xu-bian-li-huan-yuan-er-cha-shu-by-leetc/
+ 来源：力扣（LeetCode）
+ 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+ 
+ */
+class Solution1028 {
+    func recoverFromPreorder(_ S: String) -> TreeNode? {
+        let SS = Array(S)
+        var path = [TreeNode]()
+        var pos = 0
+        
+        while pos < SS.count {
+            
+            var level = 0
+            while SS[pos] == "-" {
+                level += 1
+                pos += 1
+            }
+            
+            var value = 0
+            while pos < SS.count && SS[pos].isNumber {
+                value = value * 10 + Int(String(SS[pos]))!
+                pos += 1
+            }
+            
+            let node = TreeNode(value)
+            if level == path.count {
+                if !path.isEmpty {
+                    path.last?.left = node
+                }
+            }else{
+                while level != path.count {
+                    path.removeLast()
+                }
+                path.last?.right = node
+            }
+            path.append(node)
+        }
+                
+        return path.first
+    }
+    
+    
+    func test(){
+        Codec().serialize(recoverFromPreorder("1-2--3---4-5--6---7")) == "[1,2,5,3,null,6,null,4,null,7]"
+    }
+}
+
+Solution1028().test()
+
+class Solution344 {
+    func reverseString(_ s: inout [Character]) {
+        var i = 0, j = s.count - 1
+        while i < j {
+            (s[i],s[j]) = (s[j],s[i])
+            i += 1
+            j -= 1
+        }
+    }
+}
+var m:[Character] = ["H","a","n","n","a","h"]//["h","e","l","l","o"]
+Solution344().reverseString(&m)
+
+/**
+ 两个数组的交集 II
+ */
+class Solution350 {
+    func intersect(_ nums1: [Int], _ nums2: [Int]) -> [Int] {
+        if nums1.count > nums2.count {
+            return intersect(nums2, nums1)
+        }
+        // nums1长度最小
+        var res:[Int] = [Int]()
+        
+//        let nnums2 = nums2.sorted()
+//        let nnums1 = nums1.sorted()
+        
+        var map = [Int:Int]()
+        for num in nums2{
+            if let c = map[num] {
+                map[num] = c + 1
+            }else{
+                map[num] = 1
+            }
+        }
+        
+        for num in nums1 {
+            if let n = map[num], n != 0 {
+                    map[num] = n - 1
+                    res.append(num)
+            }
+        }
+        
+//        for i in 0..<nnums2.count {
+//            var ares = [Int]()
+//            for j in 0..<nnums1.count {
+//
+//                if i+j < nnums2.count && nnums1[j] == nnums2[i+j] {
+//                    ares.append(nnums1[j])
+//                    print(ares)
+//                }
+//            }
+//            res = ares.count > res.count ? ares : res
+//        }
+        
+        return res
+    }
+    
+    func test() {
+        intersect([1,2,2,1], [2,2]) == [2,2]
+        intersect([4,9,5], [9,4,9,8,4]) == [4,9]
+        intersect([2,1], [1,2]) == [1,2]
+        intersect([3,1,2], [1,3]) == [1,3]
+    }
+}
+Solution350().test()
+
+/**
+ 最佳观光组合
+ https://leetcode-cn.com/problems/best-sightseeing-pair/
+ */
+class Solution1014 {
+    /**
+     思路: 求A[i]+A[j]+i-j的最值问题，可以分成A[i]+i + A[j] - j两部分（分解问题).其中A[j]-j是固定变化量，则问题可以转化为
+     求A[i]+i的最大值
+     */
+    func maxScoreSightseeingPair(_ A: [Int]) -> Int {
+        var res = 0
+                
+        var maxi = A[0]+0
+        for j in 1..<A.count{
+            res = max(res, maxi+A[j]-j)
+            maxi = max(maxi, A[j]+j)
+        }
+//        for i in 0..<A.count {
+//            for j in i+1..<A.count {
+//                res = max(res, A[i]+A[j]+i-j)
+//            }
+//        }
+        
+        return res
+    }
+    
+    func test(){
+        maxScoreSightseeingPair([8,1,5,2,6]) == 11
+    }
+    
+}
+
+Solution1014().test()
 
 /**
  297 hard,二叉树的序列化与反序列化 序列化是将一个数据结构或者对象转换为连续的比特位的操作，进而可以将转换后的数据存储在一个文件或者内存中，同时也可以通过网络传输到另一个计算机环境，采取相反方式重构得到原数据。
@@ -56,7 +374,7 @@ class Codec {
         return _deserialize(&list)
 
     }
-    func _serialize(_ root: TreeNode?, _ str:String) -> String {
+    private func _serialize(_ root: TreeNode?, _ str:String) -> String {
         var str = str
         if root == nil {
             str += "null,"
@@ -68,7 +386,7 @@ class Codec {
         return str
     }
     
-    func _deserialize(_ list:inout [Substring]) -> TreeNode?{
+    private func _deserialize(_ list:inout [Substring]) -> TreeNode?{
         guard list.count != 0 else {
             return nil
         }
@@ -184,44 +502,6 @@ class Codec_Fail_序列化失败 {
 //node.right = TreeNode(3)
 //node.right?.left = TreeNode(4)
 //node.right?.right = TreeNode(5)
-
-/**
- 两个数组的交集 II
- */
-class Solution {
-    func intersect(_ nums1: [Int], _ nums2: [Int]) -> [Int] {
-        if nums1.count > nums2.count {
-            return intersect(nums2, nums1)
-        }
-        // nums1长度最小
-        var res:[Int] = [Int]()
-        
-        let nnums2 = nums2.sorted()
-        let nnums1 = nums1.sorted()
-
-        for i in 0..<nnums2.count {
-            var ares = [Int]()
-            for j in 0..<nnums1.count {
-                
-                if i+j < nnums2.count && nnums1[j] == nnums2[i+j] {
-                    ares.append(nnums1[j])
-                    print(ares)
-                }
-            }
-            res = ares.count > res.count ? ares : res
-        }
-        
-        return res
-    }
-    
-    func test() {
-        intersect([1,2,2,1], [2,2]) == [2,2]
-        intersect([4,9,5], [9,4,9,8,4]) == [4,9]
-        intersect([2,1], [1,2]) == [1,2]
-        intersect([3,1,2], [1,3]) == [1,3]
-    }
-}
-Solution().test()
 
 /**
  移动零
@@ -593,7 +873,7 @@ Solution15().testCase()
 /**
  关于树的几个基础问题
  */
-class Solution {
+class SolutionTree {
     // 最大深度
     func maxDepth(_ root: TreeNode?) -> Int {
         if root == nil {
