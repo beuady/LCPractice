@@ -10,6 +10,7 @@ class Solution {
 }
 
 /**
+  不同整数的最少数目
  https://leetcode-cn.com/contest/weekly-contest-193/problems/least-number-of-unique-integers-after-k-removals/
  */
 class Solution5437 {
@@ -75,6 +76,7 @@ class Solution5437 {
 Solution5437().test()
 
 /**
+ 一维数组的动态和
  https://leetcode-cn.com/contest/weekly-contest-193/problems/running-sum-of-1d-array/
  */
 class Solution5436 {
