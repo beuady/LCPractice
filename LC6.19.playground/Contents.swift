@@ -6,20 +6,635 @@ let s = "abc"
 //let ai = s.index(s.startIndex, offsetBy: 1)
 //print(ai)
 //print(s[ai])
-
-let str = "a"
-print(str)
-
-// Definition for a binary tree node.
+//let array = [2,3,1,2,4,3]
 
 /**
- 
+ 215. 数组中的第K个最大元素
  */
-class Solution {
-    func strStr(_ haystack: String, _ needle: String) -> Int {
-        
+class Solution215 {
+    func findKthLargest(_ nums: [Int], _ k: Int) -> Int {
+        let sorted = nums.sorted()
+        //        print(sorted)
+        var j = 0
+        for i in (0..<sorted.count).reversed() {//swift倒序的时候
+            //            print(sorted[i])
+            j += 1
+            if j>=k {
+                return sorted[i]
+                
+            }
+        }
+        return 0
+    }
+    
+    func test() {
+        findKthLargest([3,2,3,1,2,4,5,5,6], 4)==4
+        findKthLargest([3,2,1,5,6,4], 2)==5
     }
 }
+Solution215().test()
+
+// let str = "a"
+//print(str)
+/**
+ 长度最小的子数组
+ */
+class Solution209 {
+    // 前缀和+二分查找 O(nlogn)
+    func minSubArrayLen(_ s: Int, _ nums: [Int]) -> Int {
+        if nums.count == 0 {
+            return 0
+        }
+        //
+        var S = [Int](repeating: 0, count: nums.count+1)
+        for i in 1...nums.count {
+            S[i] = S[i-1] + nums[i-1]
+        }
+//        print(nums)
+//        print(S)
+        
+        var ans = Int.max
+        for i in 1...nums.count {
+            let target = S[i-1] + s
+            var bound = binarySearch(S, target)
+//            print( bound,i-1, target)
+            if bound == -1 {
+                continue
+            }
+            if bound <= nums.count {
+                ans = min(ans, bound - (i-1))
+            }
+        }
+        return ans == Int.max ? 0 : ans
+    }
+    
+    func binarySearch(_ nums:[Int],_ target:Int) -> Int {
+        var l = 0, r = nums.count - 1
+        while l < r {
+            let mid = (l+r)>>1
+            if nums[mid] < target {
+                l = mid+1
+            }else{
+                r = mid
+            }
+            
+        }
+        return nums[l] >= target ? l : -1
+        
+    }
+    
+    
+    func minSubArrayLen_sliceWindow(_ s: Int, _ nums: [Int]) -> Int {
+        if nums.count == 0 {
+            return 0
+        }
+        var l = 0, r = 0, res=Int.max
+        while r < nums.count {
+            while l<=r && isMin(nums,l,r, s) {
+                res = min(res, r-l+1)
+                l += 1
+            }
+            r += 1
+        }
+        if res == Int.max {
+            return 0
+        }
+        return res
+    }
+    func isMin(_ nums:[Int], _ l:Int, _ r:Int,_ s:Int)->Bool {
+        var sum = 0
+        for i in l...r {
+            sum += nums[i]
+        }
+        return sum >= s
+    }
+    
+    func test() {
+        minSubArrayLen(100, [])
+//        minSubArrayLen(7, [2,3,1,2,4,3])==2
+//        minSubArrayLen(4, [1,4,4])
+        
+//        minSubArrayLen(3, [1,1])
+    }
+}
+Solution209().test()
+
+/**
+191.位1的个数
+ */
+class Solution191 {
+    func hammingWeight(_ n: Int) -> Int {
+        let N = String(n, radix: 2)
+        var res = 0
+        for char in N {
+            if char == "1" {
+                res += 1
+            }
+        }
+        return res
+    }
+}
+
+/**
+ 合并两个有序数组 88
+ 给你两个有序整数数组 nums1 和 nums2，请你将 nums2 合并到 nums1 中，使 nums1 成为一个有序数组。
+
+ 说明:
+
+ 初始化 nums1 和 nums2 的元素数量分别为 m 和 n 。
+ 你可以假设 nums1 有足够的空间（空间大小大于或等于 m + n）来保存 nums2 中的元素。
+  
+ */
+class Solution88 {
+    func merge(_ nums1: inout [Int], _ m: Int, _ nums2: [Int], _ n: Int) {
+        let N = nums1.count
+        var i=0,j=0
+        while j<n {
+            if i >= m+j {
+                nums1.insert(nums2[j], at: i)
+                j += 1
+            }else{
+                if nums2[j] < nums1[i] {
+                    nums1.insert(nums2[j], at: i)
+                    j += 1
+                }
+            }
+            i += 1
+        }
+        while nums1.count > N {
+            nums1.remove(at: nums1.count-1)
+        }
+    }
+    
+    func test(){
+        var tmp = [0,0,0,0,0,0,0,0]
+        merge(&tmp, 3, [2,5,6], 3)
+        print(tmp)
+        tmp == [1,2,2,3,5,6]
+//        var tmp = [0]
+//        merge(&tmp, 0, [1], 1)
+//        tmp == [1]
+    }
+}
+
+Solution88().test()
+
+/**
+ 41. 缺失的第一个正数
+ */
+class Solution41 {
+    //原地哈算法
+    // -1 4 1 3 origins
+    // 1 -1 3 4  nums
+    // 0 1  2 3  indexs
+    func firstMissingPositive(_ nums: [Int]) -> Int {
+        var nums = nums
+        for i in 0..<nums.count {
+            // can swap &&  no repeat
+            while nums[i]>=1 && nums[i] <= nums.count && nums[nums[i]-1] != nums[i] {
+                (nums[i], nums[nums[i]-1]) = (nums[nums[i]-1], nums[i])
+            }
+        }
+        
+        for i in 0..<nums.count {
+            if nums[i]-1 != i {
+                return i+1
+            }
+        }
+        return nums.count+1
+    }
+}
+
+/**
+  外观数列 38
+ */
+
+class Solution38 {
+    func countAndSay(_ n: Int) -> String {
+        var i = 1
+        var last = "1"
+        var res = ""
+        var count = 0
+        while i < n  {
+            res = ""
+            count = 0
+            var lastCh = last.first!
+            for ch in last {
+                if ch != lastCh {
+                    res += "\(count)\(lastCh)"
+                    lastCh = ch
+                    count = 1
+                }else{
+                    count += 1
+                }
+                
+            }
+            res += "\(count)\(lastCh)" //计算last最后相等的部分
+//            print(res)
+            last = res
+            i += 1
+        }
+
+        return last
+    }
+    
+    func countAndSay_enum(_ n: Int) -> String {
+        var i = 1
+        var last = "1"
+        var res = ""
+        while i < n  {
+
+            res = ""
+            let S = Array(last)
+            var j = 1
+            var count = 1
+            
+            while j <= S.count {
+                if j == S.count {
+                    res += "\(count)\(S[j-1])"
+                }else{
+                    if S[j-1] != S[j] {
+                        res += "\(count)\(S[j-1])"
+                        count = 1
+                    }else{
+                        count += 1
+                    }
+                }
+                j += 1
+            }
+            
+            last = res
+           
+            i += 1
+        }
+        return last
+    }
+    
+    func test(){
+//        countAndSay(1) == "1"
+//        countAndSay(3) == "21"
+        countAndSay(4) == "1211"
+//        countAndSay(5) == "111221"
+//        countAndSay(6) == "312211"
+
+    }
+}
+Solution38().test()
+
+/**
+ 有效的字母异位词 242
+ */
+class Solution242 {
+    func isAnagram_sort(_ s: String, _ t: String) -> Bool {
+        return s.sorted() == t.sorted()
+    }
+    func isAnagram(_ s: String, _ t: String) -> Bool {
+        if s.count != t.count {
+            return false
+        }
+        let S = Array(s)
+        let T = Array(t)
+        var map = [Character:Int]()
+        for i in 0..<S.count {
+            let ch = S[i]
+            map[ch] = (map[ch] ?? 0) + 1
+        }
+        
+        for ch in T {
+            if let n = map[ch] {
+                if n == 0 {
+                    return false
+                }
+                map[ch] = n - 1
+            }else{
+                return false
+            }
+        }
+
+        return true
+    }
+    
+    func test() {
+        isAnagram("anagram", "nagaram")==true
+        isAnagram("rat", "car")==false
+    }
+}
+Solution242().test()
+
+/**
+ 旋转图像
+ */
+class Solution48 {
+    func rotate(_ matrix: inout [[Int]]) {
+        let n = matrix[0].count
+        //转置+翻转
+//        print(matrix)
+        for i in 0..<matrix.count {
+            for j in i..<n {
+                (matrix[i][j], matrix[j][i]) = ( matrix[j][i],matrix[i][j])
+            }
+        }
+//        print(matrix)
+        for i in 0..<matrix.count {
+            for j in 0..<n/2 {
+                (matrix[i][j], matrix[i][n-j-1]) = ( matrix[i][n-j-1],matrix[i][j])
+            }
+        }
+//        print(matrix)
+    }
+    
+    func test(){
+        var inp = [[1,2,3],
+        [4,5,6],
+        [7,8,9]]
+        rotate(&inp)
+        
+//            [7,4,1],
+//            [8,5,2],
+//            [9,6,3]
+
+    }
+    
+}
+Solution48().test()
+
+
+/**
+ 8 字符串转换整数 (atoi)
+ */
+class Solution {
+     // 状态转换之间的表
+     //     ' '    +/-    number    other
+     //  start    start    signed    in_number    end
+     //  signed    end    end    in_number    end
+     //  in_number    end    end    in_number    end
+     //  end    end    end    end    end
+    let table = [
+        "start":["start", "sign", "in_num", "end"],
+        "sign":["end", "end", "in_num", "end"],
+        "in_num":["end", "end","in_num", "end"],
+        "end":["end","end","end","end"],
+    ]
+    //状态表方法
+    func myAtoi(_ str: String) -> Int {
+        var res = 0
+        
+        let S = Array(str)
+        var isSub = 0
+        var state = "start"
+        for ch in S {
+            var nextState = 0
+            if ch == " " {
+                nextState = 0
+            }else if ch == "+" || ch == "-" {
+                nextState = 1
+            }else if ch.isWholeNumber {
+                nextState = 2
+            }else {
+                nextState = 3
+            }
+            state = table[state]![nextState]
+            if state == "sign" {
+                isSub = ch == "-" ? 1 : 0
+            }else if state == "in_num" {
+                res = res * 10 + ch.wholeNumberValue!
+                if res > Int32.max {
+                    return Int(isSub == 1 ? Int32.min : Int32.max)
+                }
+            }else if state == "end"{
+                break
+            }
+        }
+        res = isSub==1 ? -res : res
+        return res
+    }
+    
+
+    
+    /**
+     这样下面判断枚举的做法有一个问题，就是对于字符串的变化判断较多。有什么机制可以减少判断的难度？
+     答案就是状态机，LeeCode官方题解成为
+     */
+    func myAtoi_enum(_ str: String) -> Int {
+        var res = 0
+        let S = Array(str)
+        var isSub:Bool?
+        var i = 0
+        while i < S.count {
+            let char = S[i]
+                        
+            if char == " " {
+                if isSub != nil {
+                    break
+                }
+            }else if char == "+" || char == "-" {
+                if isSub==nil {
+                    isSub = false
+                    if char == "-"{
+                        isSub = true
+                    }
+                }else{
+                    break
+                }
+            }else{
+                if char.isWholeNumber {
+                    if isSub==nil {
+                        isSub = false
+                    }
+                    let temp = res&*10 + char.wholeNumberValue!
+                    if  temp > Int32.max {
+                        return Int(isSub! ? Int32.min : Int32.max)
+                    }
+                    res = temp
+                }else{
+                    break
+                }
+            }
+            
+            i += 1
+        }
+                
+        if let sub = isSub, sub{
+            return -res
+        }
+        return res
+    }
+    
+    func test(){
+        myAtoi("42")==42
+        myAtoi("   -42") == -42
+        myAtoi("4193 with words") == 4193
+        myAtoi("words and 987") == 0
+        myAtoi("+-2")==0
+        myAtoi("+1")==1
+        myAtoi("-91283472332") == -2147483648
+        myAtoi("   +0 123")==0
+        myAtoi("2147483648")==Int32.max
+        myAtoi("0-1")==0
+    }
+}
+//print(Int32.max)
+//print(Int32.min)
+Solution().test()
+
+ public class ListNode {
+     public var val: Int
+     public var next: ListNode?
+     public init(_ val: Int) {
+         self.val = val
+         self.next = nil
+     }
+ }
+/**
+ 面试题 02.01 移除重复节点
+ */
+class Solution0201 {
+    func removeDuplicateNodes(_ head: ListNode?) -> ListNode? {
+        var set = Set<Int>()
+        var pre = head
+        var cur = head
+        while cur != nil {
+            if set.contains(cur!.val) {
+                pre?.next = cur?.next
+            }else{
+                set.insert(cur!.val)
+                pre = cur
+            }
+            cur = cur?.next
+        }
+        return head
+    }
+}
+
+/**
+   实现 strStr()
+ */
+class Solution28 {
+    func strStr(_ haystack: String, _ needle: String) -> Int {
+        let H = Array(haystack)
+        let N = Array(needle)
+
+        if N.count == 0 {
+            return 0
+        }
+        if H.count == 0 && N.count != 0 {
+            return -1
+        }
+        
+        var l = 0, r = 0
+        while l < H.count && r < H.count {
+            if H[l] == N[0] {
+                r = l
+                var match = true
+                if l+N.count > H.count {//溢出
+                    match = false
+                }else{
+                    while r < l+N.count {
+                        if H[r] != N[r-l] {//有一大部分的重复判断
+                            match = false
+                            break
+                        }
+                        r += 1
+                    }
+                }
+                if match {
+                    return l
+                }
+            }
+            l += 1
+        }
+        return -1
+    }
+    
+    //其他人的解法
+    func strStr_other1(_ haystack: String, _ needle: String) -> Int {
+        //边界条件值得学习
+        guard !needle.isEmpty else {
+            return 0
+        }
+        guard !haystack.isEmpty else {
+            return -1
+        }
+        
+        //太依赖语法糖，算法逻辑没得到锻炼
+        var pos = -1;
+        if let range = haystack.range(of: needle, options: .literal) {
+            if !range.isEmpty {
+                pos = haystack.distance(from: haystack.startIndex, to: range.lowerBound)
+            }
+        }
+        
+        return pos
+    }
+
+    //值得学习的部分字符串API的使用
+    func strStr_other2(_ haystack: String, _ needle: String) -> Int {
+        if needle == "" { return 0 }
+        if needle.count > haystack.count { return -1}
+        
+        var index: Int = -1
+        let step = needle.count
+        
+        // i = index, c = char
+        for (i, c) in haystack.enumerated().makeIterator() {
+            if i + step > haystack.count {// 要检查的startIndex+needle.count大于haystack长度，肯定不匹配了
+                break
+            }
+            
+            if c == needle.first {//匹配第一个字符
+                let start = haystack.index(haystack.startIndex, offsetBy: i)
+                let end = haystack.index(start, offsetBy: step)
+                // 语法糖找到这个[start..<end]区间，用subscript提取字符串进行匹配判断
+                if haystack[start..<end] == needle {
+                    index = i
+                    break
+                }
+            }
+        }
+        
+        return index
+    }
+    
+        
+    //O(n^2)
+    func strStr_timeout(_ haystack: String, _ needle: String) -> Int {
+        let H = Array(haystack)
+        let N = Array(needle)
+        
+        for i in 0...H.count {
+                        
+            var match = true
+            if H.count - i < N.count {
+                match = false
+            }
+            for j in i..<H.count {
+                if j-i<N.count {
+//                    print( j, j-i, H[j], N[j-i])
+                    if H[j] != N[j-i] {
+                        match = false
+                        break
+                    }
+                }
+            }
+            if match {
+                return i
+            }
+              
+        }
+        
+        return -1
+    }
+    
+    func test(){
+        strStr("a", "")==0
+        strStr("", "a") == -1
+        strStr("aaaaa","bba") == -1
+        strStr("", "")==0
+        strStr("hello", "ll") == 2
+        strStr("aaaaa", "bba") == -1
+    }
+}
+Solution28().test()
 
 /**
  13. 罗马数字转整数
