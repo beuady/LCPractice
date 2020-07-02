@@ -8,6 +8,117 @@ let s = "abc"
 //print(s[ai])
 //let array = [2,3,1,2,4,3]
 
+public class ListNode {
+    public var val: Int
+    public var next: ListNode?
+    public init(_ val: Int) {
+        self.val = val
+        self.next = nil
+    }
+}
+
+/**
+ 3. 无重复字符的最长子串
+ */
+class Solution3 {
+    func lengthOfLongestSubstring(_ s: String) -> Int {
+        var l=0, r = -1 //这里右边界必须有移动
+        let S = Array(s)
+        var set = Set<Character>()
+        var res = 0
+        let n = s.count
+        while l < n {
+            if l != 0  {
+                set.remove(S[l-1])
+            }
+            while r+1 < n && !set.contains(S[r+1]) {
+                print(S[r+1])
+                set.insert(S[r+1])
+                r += 1
+            }
+            
+            res = max(res, r - l+1)
+            
+            l += 1
+        }
+        return res
+    }
+    
+    func test(){
+        lengthOfLongestSubstring("abcabcbb")==3
+        lengthOfLongestSubstring("bbbbb")==1
+        lengthOfLongestSubstring("pwwkew")==3
+        lengthOfLongestSubstring(" ")==1
+    }
+}
+Solution3().test()
+
+/**
+ * 两数相加
+ */
+class Solution2 {
+    func addTwoNumbers(_ l1: ListNode?, _ l2: ListNode?) -> ListNode? {
+        var jin = 0
+        var cur1 = l1, cur2 = l2
+        var sum0:ListNode? = nil
+        var sumNode:ListNode? = nil
+        while cur1 != nil || cur2 != nil || jin != 0 {
+            
+            var val = (cur1?.val ?? 0) + (cur2?.val ?? 0)+jin
+            jin = val/10
+            val = val%10
+            if sumNode==nil {
+                sumNode = ListNode(val)
+                sum0 = sumNode
+            }else{
+                sumNode?.next = ListNode(val)
+                sumNode = sumNode?.next
+            }
+            
+            cur1 = cur1?.next
+            cur2 = cur2?.next
+        }
+        
+        return sum0
+    }
+    
+   
+}
+
+
+class CQueue {
+    var stackAdd = [Int]()
+    var stackDelete = [Int]()
+    init() {
+        
+    }
+    
+    func appendTail(_ value: Int) {
+        stackAdd.append(value)
+    }
+    
+    func deleteHead() -> Int {
+        if stackDelete.isEmpty {
+            while !stackAdd.isEmpty {
+                stackDelete.append(stackAdd.popLast()!)
+            }
+        }
+        if stackDelete.isEmpty {
+            return -1
+        }else{
+            return stackDelete.popLast()!
+        }
+        
+    }
+        
+}
+
+// Your CQueue object will be instantiated and called as such:
+let value = 1
+let obj = CQueue()
+obj.appendTail(value)
+let ret_2: Int = obj.deleteHead()
+
 /**
  215. 数组中的第K个最大元素
  */
@@ -477,14 +588,7 @@ class Solution {
 //print(Int32.min)
 Solution().test()
 
- public class ListNode {
-     public var val: Int
-     public var next: ListNode?
-     public init(_ val: Int) {
-         self.val = val
-         self.next = nil
-     }
- }
+
 /**
  面试题 02.01 移除重复节点
  */

@@ -18,7 +18,7 @@ import UIKit
 class Solution {
     //思路，BFS+k次限制的迭代即可遍历，终点实际就是数字n,
     func minNumberOfSemesters(_ n: Int, _ dependencies: [[Int]], _ k: Int) -> Int {
-        
+
     }
 }
 
@@ -28,6 +28,49 @@ func test() {
 test()
 
 class Solution7777 {
+    
+    func longestSubarray_dp(_ nums: [Int]) -> Int {
+        let n = nums.count
+        var dp0=[Int](repeating: 0, count: n+1)
+        var dp1=[Int](repeating: 0, count: n+1)
+        var ans = 0
+        dp1[0] = Int.min
+        for i in 0..<n {
+            dp0[i+1] = nums[i]==1 ? dp0[i]+1:0
+            dp1[i+1] = dp0[i]
+            if nums[i] != 0 {
+                dp1[i+1] = max(dp1[i+1], dp1[i]+1)
+            }
+            ans = max(ans, dp1[i+1])
+        }
+        
+        return ans
+    }
+    
+    func longestSubarray_slicewindow(_ nums: [Int]) -> Int {
+        var l=0, r = 0, n = nums.count, count = 0
+        var ans = 0
+        // slide window, 左边界的收敛条件，可以结合右边界做制造，不一定用独立的判断函数
+        while r < n {
+            if nums[r] == 0 {
+                count += 1
+            }
+
+            while count >= 2 {
+                if nums[l] == 0 {
+                    count -= 1
+                }
+                l += 1
+            }
+
+            ans = max(ans, r-l)
+            print(ans, r, l)
+            r += 1
+        }
+        return ans
+    }
+    
+    
     func longestSubarray(_ nums: [Int]) -> Int {
         var zeroI = -1
         var l = 0 , r = 0
@@ -90,17 +133,17 @@ class Solution7777 {
     }
 }
 
-//func test() {
+func test() {
 //    Solution().longestSubarray([1,1,0,1])==3
-//    Solution().longestSubarray([0,1,1,1,0,1,1,0,1])==5
+    Solution7777().longestSubarray_slicewindow([0,1,1,1,0,1,1,0,1])==5
 //    Solution().longestSubarray([1,1,1])==2
 //    Solution().longestSubarray([1,1,0,0,1,1,1,0,1])==4
 //    Solution().longestSubarray([0,0,0])==0
 //    Solution().longestSubarray([1,0,0,0,0])==1
 //    Solution().longestSubarray([0,0,1,1])==2
 
-//}
-//test()
+}
+test()
 
 class Solution6666 {
     func kthFactor(_ n: Int, _ k: Int) -> Int {
@@ -132,11 +175,20 @@ class Solution6666 {
 
 class Solution5555 {
     func average(_ salary: [Int]) -> Double {
-        let sorts = salary.sorted()
-        var res:Double = 0
-        for i in 1..<sorts.count-1 {
-            res += Double(sorts[i])
+//        let sorts = salary.sorted()
+//        var res:Double = 0
+//        for i in 1..<sorts.count-1 {
+//            res += Double(sorts[i])
+//        }
+//        return res / Double((sorts.count-2))
+        var mx = Int.min
+        var mn = Int.max
+        var sum = 0
+        for i in 0..<salary.count {
+            mx = max(mx, salary[i])
+            mn = min(mn, salary[i])
+            sum += salary[i]
         }
-        return res / Double((sorts.count-2))
+        return Double((sum - mx - mn) / (salary.count-2))
     }
 }
