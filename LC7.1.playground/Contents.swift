@@ -4,6 +4,50 @@ let aword = String("abcd")
 let index = aword.index(aword.startIndex, offsetBy: 2)
 aword[index]
 
+class Solution350 {
+    // sorted
+    func intersect(_ nums1: [Int], _ nums2: [Int]) -> [Int] {
+        var ans = [Int]()
+        
+        let s1 = nums1.sorted()
+        let s2 = nums2.sorted()
+        let n1 = s1.count, n2 = s2.count
+        var i=0, j=0
+        while i < n1 && j < n2 {
+            if s1[i] == s2[j] {
+                ans.append(s1[i])
+                i += 1
+                j += 1
+            }else if s1[i] > s2[j] {
+                j += 1
+            }else{
+                i += 1
+            }
+        }
+        
+        return ans
+
+    }
+    func intersect_map(_ nums1: [Int], _ nums2: [Int]) -> [Int] {
+        let slice = nums1.map{($0,1)}
+        var map1 = Dictionary(slice, uniquingKeysWith: +)
+        var ans = [Int]()
+        for num in nums2 {
+            if let n = map1[num], n > 0 {
+                map1[num] = n - 1
+                ans.append(num)
+            }
+        }
+        return ans
+    }
+    
+    func test(){
+        intersect([1,2,2,1], [2,2])
+    }
+}
+Solution350().test()
+
+
 /**
  309. 最佳买卖股票时机含冷冻期
  */
