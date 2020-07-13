@@ -1,5 +1,679 @@
 import UIKit
 
+let aword = String("abcd")
+let index = aword.index(aword.startIndex, offsetBy: 2)
+aword[index]
+
+/**
+ 309. 最佳买卖股票时机含冷冻期
+ */
+class Solution {
+    func maxProfit(_ prices: [Int]) -> Int {
+        var ans = 0
+        let n = prices.count
+        
+        for i in 0..<n {
+            let mx = max(
+        }
+    }
+    
+    func test(){
+        
+    }
+}
+
+Solution().test()
+
+
+
+/*
+class Solution {
+    static final long P = Integer.MAX_VALUE;
+    static final long BASE = 41;
+
+
+    public long getHash(String s) {
+        long hashValue = 0;
+        for (int i = s.length() - 1; i >= 0; --i) {
+            hashValue = (hashValue * BASE + s.charAt(i) - 'a' + 1) % P;
+        }
+        return hashValue;
+    }
+ 
+     public int respace(String[] dictionary, String sentence) {
+     Set<Long> hashValues = new HashSet<Long>();
+     for (String word : dictionary) {
+     hashValues.add(getHash(word));
+     }
+     
+     int[] f = new int[sentence.length() + 1];
+     Arrays.fill(f, sentence.length());
+     
+     f[0] = 0;
+     for (int i = 1; i <= sentence.length(); ++i) {
+         f[i] = f[i - 1] + 1;
+         long hashValue = 0;
+         for (int j = i; j >= 1; --j) {
+             int t = sentence.charAt(j - 1) - 'a' + 1;
+             hashValue = (hashValue * BASE + t) % P;
+             if (hashValues.contains(hashValue)) {
+                f[i] = Math.min(f[i], f[j - 1]);
+             }
+        }
+     }
+     
+     return f[sentence.length()];
+     }
+}
+*/
+
+/**
+ 面试题 17.13. 恢复空格
+ */
+class Solution {
+    let P = Int64.max
+    let BASE:Int64 = 41
+    func respace(_ dictionary: [String], _ sentence: String) -> Int {
+        var hashValues = Set<Int64>()
+        for word in dictionary {
+            hashValues.insert(getHash(word))
+        }
+        print(hashValues)
+        let sendLength = sentence.count
+        var f = [Int](repeating: 0, count: sentence.count+1)
+        
+        f[0] = 0
+        print("...")
+        for i in 1...sendLength {
+            f[i] = f[i-1] + 1
+            var hashValue:Int64 = 0
+            print(i, "i")
+            for j in stride(from: i, to: 1, by: -1) {
+                print(i,j, "j")
+                let t = sentence[sentence.index(sentence.startIndex, offsetBy: j-1)]
+                hashValue = (hashValue * BASE + Int64(t.asciiValue!)) % P
+                if hashValues.contains(hashValue) {
+                    f[i] = min(f[i], f[j-1])
+                }
+            }
+        }
+        return f[sendLength]
+    }
+    
+    func getHash(_ s:String) -> Int64  {
+        
+        var hashValue:Int64 = 0
+        let n = s.count
+        for i in stride(from: n-1, to: 0, by: -1) {
+            var index = s.index(s.startIndex, offsetBy: i)
+            let sub = Int64(s[index].asciiValue! - Character("a").asciiValue!)
+            hashValue = (hashValue * BASE + sub + 1) % P
+        }
+        return hashValue
+    }
+    
+    func test(){
+        respace(["looked","just","like","her","brother"],
+        "jesslookedjustliketimherbrother")==7
+    }
+}
+Solution().test()
+
+/**
+ 面试题 16.11. 跳水板
+ */
+class Solution16_11 {
+   func divingBoard(_ shorter: Int, _ longer: Int, _ k: Int) -> [Int] {
+        if k == 0 {
+            return []
+        }
+        if shorter == longer {
+            return [shorter*k]
+        }
+        var ans = [Int](repeating: 0, count: k+1)
+        var res = 0
+        for i in 0...k {
+            if i > 0 {
+                res = ans[i-1] + longer - shorter
+            }else{
+                res = (k-i)*shorter + i*longer
+            }
+            ans[i] = res
+
+        }
+        return ans.sorted()
+    }
+    
+    func test(){
+        divingBoard(2,
+        1118596,
+        979)
+    }
+}
+Solution().test()
+
+/**
+367. 有效的完全平方数
+ */
+class Solution367 {
+    func isPerfectSquare(_ num: Int) -> Bool {
+        var l:Int = 1
+        var r = num
+        while l <= r {
+            let mid = (l+r)>>1
+//            print(l, r, mid)
+                let target = mid*mid
+            if target == num {
+                return true
+            }else if target < num {
+                l = mid+1
+            }else if target > num {
+                r = mid-1
+            }
+        }
+        return false
+    }
+    
+    func test(){
+        isPerfectSquare(2100)==false
+    }
+}
+Solution().test()
+
+public class TreeNode {
+    public var val: Int
+    public var left: TreeNode?
+    public var right: TreeNode?
+    public init(_ val: Int) {
+        self.val = val
+        self.left = nil
+        self.right = nil
+    }
+}
+
+
+/**
+ 669. 修剪二叉搜索树
+ */
+class Solution {
+    func trimBST(_ root: TreeNode?, _ L: Int, _ R: Int) -> TreeNode? {
+        if root == nil {
+            return nil
+        }
+        if root!.val > R {
+            return trimBST(root?.left, L, R)
+        }
+        if root!.val < L {
+            return trimBST(root?.right, L, R)
+        }
+        
+        root?.left = trimBST(root?.left, L, R)
+        root?.right = trimBST(root?.right, L, R)
+
+        return root
+    }
+        
+}
+
+class Solution1361 {
+    func validateBinaryTreeNodes(_ n: Int, _ leftChild: [Int], _ rightChild: [Int]) -> Bool {
+        if n == 1 {
+            return true
+        }
+        // 图转为最小生成树的基本概念
+        // 树至多只有两个子节点的树就是二叉树
+        // 抓住一点: 一个合法的树, 边数等于结点数 - 1, 且无环无孤立的点
+        var inVs = [Int](repeating: 0, count: n)
+        var outVs = [Int](repeating: 0, count: n)
+        var edges = 0
+        for i in 0..<n {
+            if leftChild[i] != -1 {
+                edges += 1
+                inVs[leftChild[i]] += 1
+                outVs[i] += 1
+            }
+            
+            if rightChild[i] != -1 {
+                edges += 1
+                inVs[rightChild[i]] += 1
+                outVs[i] += 1
+            }
+        }
+        
+        if edges != n - 1 {
+            return false
+        }
+        
+        for i in 0..<n {
+            //
+            if inVs[i] == 0 && outVs[i] == 0 {//如果结点入度和出度都为0，就是孤立结点
+                return false
+            }
+        }
+        
+        
+        return true
+    }
+}
+
+
+class Solution112 {
+    func hasPathSum(_ root: TreeNode?, _ sum: Int) -> Bool {
+        var queue = [TreeNode]()
+        var queueVal = [Int]()
+        while queue.count != 0 {
+            let node = queue.removeFirst()
+            let temp = queueVal.removeFirst()
+            if node.left == nil && node.right == nil {
+                if temp == sum {
+                    return true
+                }
+                continue
+            }
+
+            if node.left != nil {
+                queue.append(node.left!)
+                queueVal.append(node.left!.val+temp)
+            }
+
+            if node.right != nil {
+                queue.append(node.right!)
+                queueVal.append(node.right!.val+temp)
+            }
+
+        }
+        return false
+    }
+}
+
+class Solutionxxx {
+    func uniquePathsWithObstacles(_ obstacleGrid: [[Int]]) -> Int {
+        let m = obstacleGrid.count
+        let n = obstacleGrid.first!.count
+        var dp0 = obstacleGrid[0][0] == 1 ? 0 : 1,
+//        var dp1 = obstacleGrid[0][0] == 1 ? 0 : dp0+dp1
+        
+        
+    }
+    func uniquePathsWithObstacles1(_ obstacleGrid: [[Int]]) -> Int {
+        let m = obstacleGrid.count
+        let n = obstacleGrid.first!.count
+        var dp = [Int](repeating: 0, count: n) // 滚动数组
+        dp[0] = obstacleGrid[0][0] == 1 ? 0 : 1;
+        for i in 0..<m {
+            for j in 0..<n {
+                // f(i,j) = {
+                //              0, u(i,j)=0
+                //              f(i-1,j)+f(i,j-1), u(i,j)!=0
+                //             }
+                if obstacleGrid[i][j] == 1 {
+                    dp[j] = 0
+                    continue
+                }
+                if j-1>=0 && obstacleGrid[i][j-1]==0 {
+                    dp[j] = dp[j] + dp[j-1]
+                }
+            }
+        }
+        return dp[n-1] //
+    }
+}
+
+/**
+ 32. 最长有效括号
+ */
+class Solution32 {
+    func longestValidParentheses(_ s: String) -> Int {
+        let n = s.count
+        if n < 2 {
+            return 0
+        }
+        let S = Array(s)
+        var stack = [Int]()
+        stack.append(-1)
+        var maxLen = 0
+        for i in 0..<n {
+            if S[i] == "(" {
+                stack.append(i)
+            }else {
+                stack.removeLast()
+                if stack.isEmpty {
+                    stack.append(i)
+                }else{
+                    maxLen = max(maxLen, i - (stack.last ?? 0))
+                }
+            }
+        }
+        return maxLen
+    }
+    func longestValidParentheses_dp(_ s: String) -> Int {
+        let n = s.count
+        if n == 0 {
+            return 0
+        }
+        let S = Array(s)
+        var dp = [Int](repeating: 0, count: n+1)
+        for i in 0..<n {
+
+            if S[i] == ")" && i-dp[i]-1>=0 && S[i-dp[i]-1]=="(" {
+                print("..",i, i-dp[i] + 2)
+                dp[i+1] = 2 + dp[i] + dp[i+1-dp[i] - 2]
+            }
+        }
+        return dp.max()!
+    }
+    // 暴力法
+    func longestValidParentheses_暴力(_ s: String) -> Int {
+        let S = Array(s)
+        let n = S.count
+        var ans = 0
+        var len = n%2==0 ? n : n - 1
+        var stack = [Int]()
+//        for len in stride(from: n-1, to: 0, by: -2) {
+        while len >= 0 {
+            let count = n - len+1
+            for i in 0..<count{
+                // check
+                var validCount = 0
+                for step in 0..<len {
+                    if S[i+step] == "(" {
+                        stack.append(i+step)
+                    }else{
+                        if !stack.isEmpty {
+                            stack.removeLast()
+                            validCount += 2
+                        }
+                    }
+                }
+
+                if validCount==len {
+                    ans = max(ans, len)
+                }else{
+                    stack.removeAll()
+                }
+
+            }
+            len -= 2
+        }
+        return ans
+    }
+    func test(){
+        longestValidParentheses(")()())")==4
+//        longestValidParentheses("()")==2
+    }
+}
+Solution().test()
+
+/**
+剑指 Offer 53 - II. 0～n-1中缺失的数字
+ */
+class Solution53 {
+    func missingNumber(_ nums: [Int]) -> Int {
+        return binarySearch(nums, 0, nums.count-1)
+    }
+    
+    func binarySearch(_ nums:[Int],_ l:Int, _ r:Int) ->Int {
+        var l = l , r = r
+        while l<r   {
+            print(l, r)
+            let mid = (l+r)>>1
+            if nums[mid] == mid {
+                l = mid+1
+            }else{
+                r = mid-1
+            }
+        }
+        print(nums[l], l)
+        return nums[l]==l ? l+1 : l
+    }
+    
+    func test(){
+        missingNumber([0,1,3])==2
+        missingNumber([0,1,2,3,4,5,6,7,9])==8
+        missingNumber([0,1])==2
+    }
+}
+Solution().test()
+
+/**
+ 剑指 Offer 66. 构建乘积数组
+ */
+class Solution66 {
+    func constructArr(_ a: [Int]) -> [Int] {
+        let n = a.count
+        if n == 0 {
+            return []
+        }
+        var B = [Int](repeating: 1, count: n)
+        var Br = [Int](repeating: 1, count: n)
+        B[0] = a[0]
+        for i in 1..<n {
+            B[i] = B[i-1] * a[i]
+        }
+        print(B)
+        Br[n-1] = a[n-1]
+        for i in (0..<n-1).reversed() {
+            Br[i] = a[i] * Br[i+1]
+        }
+        print(Br)
+        
+        var ans = [Int](repeating: 0, count: n)
+        for i in 0..<n {
+            if i == 0 {
+                ans[i] = Br[i+1]
+            }else if i == n - 1 {
+                ans[i] = B[i-1]
+            }else{
+                ans[i] = B[i-1] * Br[i+1]
+            }
+        }
+        return ans
+    }
+    
+    func test(){
+//        constructArr([1,2,3,4,5])==[120,60,40,30,24]
+        constructArr([7, 2, 2, 4, 2, 1, 8, 8, 9, 6, 8, 9, 6, 3, 2, 1])==[286654464,1003290624,1003290624,501645312,1003290624,2006581248,250822656,250822656,222953472,334430208,250822656,222953472,334430208,668860416,1003290624,2006581248]
+    }
+}
+
+//Solution().test()
+
+
+/**
+ 剑指 Offer 59 - I. 滑动窗口的最大值
+ */
+class Solution59 {
+    // 1<=k<= nums.count
+    func maxSlidingWindow(_ nums: [Int], _ k: Int) -> [Int] {
+        if nums.count == 0 {
+            return []
+        }
+        var ans = [Int]()
+        var queue = [Int]()
+        for i in 0..<k {
+            while !queue.isEmpty && nums[queue.last!]<nums[i]{
+                queue.removeLast()
+            }
+            queue.append(i)
+        }
+        
+        ans.append(nums[queue.first!])
+        for i in k..<nums.count {
+            if queue.first! == i-k {
+                queue.removeFirst()
+            }
+            while !queue.isEmpty && nums[queue.last!]<nums[i]{
+                queue.removeLast()
+            }
+            queue.append(i)
+            ans.append(nums[queue.first!])
+        }
+        return ans
+    }
+    
+    // 单调栈+滑动窗口
+    func maxSlidingWindow2(_ nums: [Int], _ k: Int) -> [Int] {
+        if nums.count == 0 {
+            return []
+        }
+        var l = 0, r = 0
+        var ans = [Int](repeating: 0, count: nums.count-k+1)
+        var ascQueue = [Int]() //升序队列
+        while r < nums.count {
+
+            while !ascQueue.isEmpty && nums[ascQueue.last!]<nums[r] {
+                ascQueue.removeLast()
+            }
+            ascQueue.append(r)
+            
+            if r-l+1 == k {
+                ans[l] = nums[ascQueue.first!]
+                if ascQueue.first! == l {
+                    ascQueue.removeFirst()
+                }
+                l += 1
+            }
+
+            
+            r += 1
+        }
+        
+        return ans
+    }
+    
+    func test() {
+//        maxSlidingWindow([1,3,-1,-3,5,3,6,7], 3)==[3,3,5,5,6,7]
+//        maxSlidingWindow([1], 1)==[1]
+//        maxSlidingWindow([1,-1], 1)==[1,-1]
+        maxSlidingWindow([7,2,4], 2)==[7,4]
+    }
+}
+
+/**
+ 剑指 Offer 50. 第一个只出现一次的字符
+
+ */
+class Solution50 {
+    func firstUniqChar(_ s: String) -> Character {
+        let S = Array(s)
+        let slice = S.map{($0,1)}
+        var map = Dictionary(slice, uniquingKeysWith: +)
+        for char in S {
+            if map[char] == 1 {
+                return char
+            }
+        }
+        return S[0]
+    }
+}
+
+/**
+ 剑指 Offer 42. 连续子数组的最大和
+ */
+class Solution42{
+    func maxSubArray(_ nums: [Int]) -> Int {
+        var dp = [Int](repeating: 0, count: nums.count)
+        var res = 0
+        for i in 1..<nums.count {
+            dp[i] = nums[i] > 0 ? dp[i]+nums[i] : nums[i]
+            res = min(res, dp[i])
+        }
+        return res
+    }
+}
+
+/**
+ 面试题 03.02. 栈的最小值
+ MinStack minStack = new MinStack();
+ minStack.push(-2);
+ minStack.push(0);
+ minStack.push(-3);
+ minStack.getMin();   --> 返回 -3.
+ minStack.pop();
+ minStack.top();      --> 返回 0.
+ minStack.getMin();   --> 返回 -2.
+
+ 来源：力扣（LeetCode）
+ 链接：https://leetcode-cn.com/problems/min-stack-lcci
+ 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+ */
+class MinStack {
+
+    /** initialize your data structure here. */
+    var stack = [Int]()
+    var deque = [Int]()
+    init() {
+
+    }
+    
+    func push(_ x: Int) {
+        stack.append(x)
+        if deque.isEmpty{
+            deque.append(x)
+        }else{
+            deque.append(min(deque.last!, x))
+        }
+    }
+    
+    func pop() {
+        stack.removeLast()
+        deque.removeLast()
+    }
+    
+    func top() -> Int {
+        return stack.last ?? -1
+    }
+    
+    func getMin() -> Int {
+        return deque.last ?? -1
+    }
+}
+
+/**
+ 剑指 Offer 59 - II. 队列的最大值
+ */
+class MaxQueue {
+    var queue = [Int]()
+    var deque = [Int]()//单调队列
+    init() {
+        
+    }
+    
+    func max_value() -> Int {
+        return deque.first ?? -1
+    }
+    
+    func push_back(_ value: Int) {
+        queue.append(value)
+        
+        while !deque.isEmpty && deque.last! < value {
+            deque.removeLast()
+        }
+
+        deque.append(value)
+    }
+    
+    func pop_front() -> Int {
+        if let num = queue.first {
+            queue.removeFirst()
+            let n = deque.first ?? -1
+            if n == num  {
+                deque.removeLast()
+            }
+            return num
+        }
+        return -1
+    }
+}
+
+/**
+ * Your MaxQueue object will be instantiated and called as such:
+ * let obj = MaxQueue()
+ * let ret_1: Int = obj.max_value()
+ * obj.push_back(value)
+ * let ret_3: Int = obj.pop_front()
+ */
+
 /**
  378. 有序矩阵中第K小的元素
  */
