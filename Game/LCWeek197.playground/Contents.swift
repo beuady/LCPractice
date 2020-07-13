@@ -17,6 +17,8 @@ class Solution {
             path[edge[1]].append((edge[0], succProb[i]))
         }
         
+        var maxPath = [Double](repeating: 0, count: edges.count)
+        
         var queue = [(Int, Double)]()
         queue.append((start, 1.0))
         
@@ -27,23 +29,40 @@ class Solution {
             let (vertex, prob) = queue.removeFirst()
           
             visited.insert(vertex)
-            
+             
             if vertex == end {
-                maxProb = max(maxProb, prob)
-//                print(prob, "end")
-//                return prob
+                maxProb = max(maxProb,prob)
+                continue
             }
+            
+//            print(maxPath.count, vertex)
+            if vertex >= maxPath.count {
+                break
+            }
+            //如果从start到end的某条路径概率最大，则该路径上任意两点间的路径概率也必定是最大的
+            if prob < maxProb || prob < maxPath[vertex] {
+                continue
+            }
+            maxPath[vertex] = prob
             
             for (next, nextProb) in path[vertex] {
                                 
                 if visited.contains(next) {
                     continue
                 }
-                 
-                queue.append((next, prob * nextProb))
+                
+                
+                let p = prob * nextProb
+                if !queue.isEmpty && queue.first!.1 < p {
+                    queue.insert((next, p), at: 0)
+                }else{
+                    queue.append((next, prob * nextProb))
+                }
 
             }
             
+//            queue.sort(by: {$0.1 > $1.1})
+
         }
         
         return maxProb
@@ -104,7 +123,7 @@ class Solution {
 //        [0.5],
 //        0,
 //        2)==0
-        
+//
 //        maxProbability(
 //        5,
 //        [[2,3],[1,2],[3,4],[1,3],[1,4],[0,1],[2,4],[0,4],[0,2]],
