@@ -3,10 +3,10 @@ import UIKit
 //let d = 1e9 // 10的9次方写法
 
 class Solution {
-//    var visited = [Int]() //访问过的结点
-//    var maxProb:Double = 0
+    var visited = [Int]() //访问过的结点
+    var maxProb:Double = 0
     
-    //BFS+优先Queue（最大堆队列)
+    //BFS+Queue+前向星邻接表（最大堆队列)
     func maxProbability(_ n: Int, _ edges: [[Int]], _ succProb: [Double], _ start: Int, _ end: Int) -> Double {
         
         //转换邻接表
@@ -17,98 +17,81 @@ class Solution {
             path[edge[1]].append((edge[0], succProb[i]))
         }
         
-        var maxPath = [Double](repeating: 0, count: edges.count)
+        // 这里是优化的关键
+        var probs = [Double](repeating: 0, count: edges.count)
         
         var queue = [(Int, Double)]()
         queue.append((start, 1.0))
-        
-        var visited = Set<Int>() // vertex
-        var maxProb:Double = 0
+
         while queue.count > 0 {
             
             let (vertex, prob) = queue.removeFirst()
-          
-            visited.insert(vertex)
-             
-            if vertex == end {
-                maxProb = max(maxProb,prob)
-                continue
+//            print(vertex,",", path)
+            if path[vertex].count==0 {
+                return 0
             }
-            
-//            print(maxPath.count, vertex)
-            if vertex >= maxPath.count {
-                break
-            }
-            //如果从start到end的某条路径概率最大，则该路径上任意两点间的路径概率也必定是最大的
-            if prob < maxProb || prob < maxPath[vertex] {
-                continue
-            }
-            maxPath[vertex] = prob
-            
             for (next, nextProb) in path[vertex] {
-                                
-                if visited.contains(next) {
+                let p = prob * nextProb
+                
+                if next >= probs.count {
+                    return 0
+                }
+                
+                if probs[next] >= p {
                     continue
                 }
                 
-                
-                let p = prob * nextProb
-                if !queue.isEmpty && queue.first!.1 < p {
-                    queue.insert((next, p), at: 0)
-                }else{
-                    queue.append((next, prob * nextProb))
-                }
-
+                queue.append((next, p))
+                probs[next] = p
             }
-            
-//            queue.sort(by: {$0.1 > $1.1})
 
         }
+        
+        return probs[end]
+    }
+
+    func maxProbability_fail(_ n: Int, _ edges: [[Int]], _ succProb: [Double], _ start: Int, _ end: Int) -> Double {
+        
+        for _ in 0..<n{
+            visited.append(0)
+        }
+        
+        // 求权值最大的路径
+        dfs(start, n, edges, succProb, end, 1)
+        
         
         return maxProb
     }
     
-//    func maxProbability_fail(_ n: Int, _ edges: [[Int]], _ succProb: [Double], _ start: Int, _ end: Int) -> Double {
-//
-//        for _ in 0..<n{
-//            visited.append(0)
-//        }
-//
-//        // 求权值最大的路径
-//        dfs(start, n, edges, succProb, end, 1)
-//
-//
-//        return maxProb
-//    }
+    func dfs(_ vertex:Int, _ n:Int, _ edges: [[Int]], _ succProb: [Double],_ end:Int,_ last:Double)-> Double {
+        visited[vertex] = 1
+        var prob:Double = 0
+        let edgeN = edges.count
+        for i in 0..<edgeN {
+            
+            
+            var next = -1
+            if edges[i][0] == vertex {
+                next = edges[i][1]
+            }
+            if edges[i][1] == vertex {
+                next = edges[i][0]
+            }
+            if next != -1 && visited[next] == 0 {
+                prob = succProb[i]
+                if next == end {
+                    
+                    maxProb = max(maxProb, prob*last)
+                    return prob * last
+                }else{
+                    
+                    dfs(next, n, edges, succProb, end,prob)
+                }
+            }
+        }
+        return prob
+    }
     
-//    func dfs(_ vertex:Int, _ n:Int, _ edges: [[Int]], _ succProb: [Double],_ end:Int,_ last:Double)-> Double {
-//        visited[vertex] = 1
-//        var prob:Double = 0
-//        let edgeN = edges.count
-//        for i in 0..<edgeN {
-//
-//
-//            var next = -1
-//            if edges[i][0] == vertex {
-//                next = edges[i][1]
-//            }
-//            if edges[i][1] == vertex {
-//                next = edges[i][0]
-//            }
-//            if next != -1 && visited[next] == 0 {
-//                prob = succProb[i]
-//                if next == end {
-//
-//                    maxProb = max(maxProb, prob*last)
-//                    return prob * last
-//                }else{
-//
-//                    dfs(next, n, edges, succProb, end,prob)
-//                }
-//            }
-//        }
-//        return prob
-//    }
     
     func test() {
 //        maxProbability(
@@ -130,13 +113,24 @@ class Solution {
 //        [0.06,0.26,0.49,0.25,0.2,0.64,0.23,0.21,0.77],
 //        0,
 //        3)==0.16
+//        maxProbability(
+//        5,
+//        [[1,4],[2,4],[0,4],[0,3],[0,2],[2,3]],
+//        [0.37,0.17,0.93,0.23,0.39,0.04],
+//        3,
+//            4)==0.2139
+//        maxProbability(3,
+//        [[0,1],[1,2],[0,2]],
+//        [0.5,0.5,0.3],
+//        0,
+//            2)==0.3
         maxProbability(
-        5,
-        [[1,4],[2,4],[0,4],[0,3],[0,2],[2,3]],
-        [0.37,0.17,0.93,0.23,0.39,0.04],
-        3,
-            4)==0.2139
-        
+            500,
+            [[193,229],[133,212],[224,465]],
+            [0.91,0.78,0.64],
+            4,
+            364
+        )
     }
 }
 Solution().test()

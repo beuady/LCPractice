@@ -1,8 +1,208 @@
 import UIKit
 
-let aword = String("abcd")
-let index = aword.index(aword.startIndex, offsetBy: 2)
-aword[index]
+//let aword = String("abcd")
+//let index = aword.index(aword.startIndex, offsetBy: 2)
+//aword[index]
+
+/*
+ 1466. 重新规划路线
+ */
+class Solution {
+    
+    func getroot(_ k:inout [Int], _ now:Int)->Int {
+        if k[now] != now {
+            k[now] = getroot(&k, k[now])
+        }
+        return k[now]
+    }
+    
+    func minReorder(_ n: Int, _ connections: [[Int]]) -> Int {
+        var k = [Int](repeating: 0, count: n+1)
+        var sum = 0, ret = 0
+        for i in 0..<n {
+            k[i] = i
+        }
+        repeat{
+            ret = 0
+            for i in 0..<connections.count {
+                if getroot(&k, connections[i][0]) == 0 &&
+                    getroot(&k, connections[i][1]) != 0 {
+                    k[getroot(&k, connections[i][1])] = getroot(&k, connections[i][0])
+                    sum += 1
+                    ret = 1
+                }else if getroot(&k, connections[i][1]) == 0 {
+                    k[getroot(&k, connections[i][0])] = getroot(&k, connections[i][1])
+                }
+            }
+        } while ret != 0
+        return sum
+    }
+    
+    func test(){
+        minReorder(5,
+        [[4,3],[2,3],[1,2],[1,0]])==2
+    }
+}
+Solution().test()
+
+/**
+ 35. 搜索插入位置
+ */
+class Solution35 {
+    func searchInsert(_ nums: [Int], _ target: Int) -> Int {
+        let n = nums.count
+        for i in 0..<n {
+            if nums[i] == target {
+                return i
+            }else if target < nums[i] {
+                return i
+            }
+        }
+//        if target > nums[n-1] {
+//            return n
+//        }
+
+        return n
+    }
+    func test() {
+        searchInsert([1,3,5,6], 5)==2
+        searchInsert([1,3,5,6], 2)==1
+        searchInsert([1,3,5,6], 7)==4
+        searchInsert([1,3,5,6], 0)==0
+        searchInsert([1], 2)==1
+    }
+}
+Solution35().test()
+/**
+ 785. 判断二分图
+ */
+class Solution785 {
+    var valid = true
+    var colors = [Int]() //0, 1=red, 2=green
+    func isBipartite(_ graph: [[Int]]) -> Bool {
+        let n = graph.count
+        colors = [Int](repeating: 0, count: n)
+        
+        for v in 0..<n {
+            if colors[v]==0 {
+//                dfs(v,1, graph)
+                bfs(v,1, graph)
+            }
+            if !valid {
+                return false
+            }
+        }
+        
+        
+        return valid
+    }
+    
+    func bfs(_ vertex:Int,_ color:Int, _ graph:[[Int]]) {
+        colors[vertex] = color
+        var queue = [Int]()
+        queue.append(vertex)
+        while !queue.isEmpty {
+            let v = queue.removeFirst()
+            let cc = colors[v] == 1 ? 2 : 1
+            for next in graph[v] {
+                
+                if colors[next] == 0 {
+                    queue.append(next)
+                    colors[next] = cc
+                }else if colors[next] != cc {
+                    valid = false
+                    return
+                }
+            }
+        }
+        
+    }
+    
+    func dfs(_ vertex:Int, _ color:Int, _ graph:[[Int]]) {
+        colors[vertex] = color
+        let c = color == 1 ? 2 : 1
+        for next in graph[vertex] {
+            if colors[next] == 0 {
+                dfs(next, c, graph)
+                if !valid {
+                    return
+                }
+            }else if colors[next] == color {// ?
+                print(next, colors)
+                valid = false
+                return
+            }
+        }
+    }
+    
+    
+    
+    func test(){
+        isBipartite([[1,3],[0,2],[1,3],[0,2]])==true
+//        isBipartite([[1,2,3], [0,2], [0,1,3], [0,2]])==false
+    }
+}
+Solution785().test()
+
+class Solution96 {
+    func numTrees(_ n: Int) -> Int {
+        
+        var C:Int = 1
+        for i in 0..<n {
+            C = C*2 * (2*i + 1) / (i+2)
+        }
+        return C
+    }
+}
+
+class Solution120 {
+    //状态压缩
+    func minimumTotal(_ triangle: [[Int]]) -> Int {
+        let n = triangle.count
+        var dp = [Int](repeating: 0, count: n)
+        var dp1 = [Int](repeating: 0, count: n)
+        dp[0] = triangle[0][0]
+        for i in 1..<n {
+            
+            dp1[0] = dp[0] + triangle[i][0]
+            for j in 1..<i {
+                dp1[j] = min(dp[j-1], dp[j]) + triangle[i][j]
+            }
+            dp1[i] = dp[i-1] + triangle[i][i]
+            
+            (dp1, dp) = (dp, dp1)
+        }
+        
+        return dp.min()!
+    }
+    
+    // 状态转移方程
+    func minimumTotal_dp(_ triangle: [[Int]]) -> Int {
+        let n = triangle.count
+        var dp = [[Int]](repeating: [Int](repeating: 0, count: n), count: n)//创建二维状态数组
+        
+        dp[0][0] = triangle[0][0] //
+        for i in 1..<n {
+            
+            dp[i][0] = dp[i-1][0] + triangle[i][0] //边界状态1
+            for j in 1..<i {
+                dp[i][j] = min(dp[i-1][j-1], dp[i-1][j]) + triangle[i][j]
+            }
+            dp[i][i] = dp[i-1][i-1] + triangle[i][i] //边界状态2
+            
+        }
+                
+        return dp[n-1].min()! // dp[i][0] ... dp[i][n]的之间的最大值
+    }
+    
+    func test() {
+        minimumTotal([[2],[3,4],[6,5,7],[4,1,8,3]])==11
+        minimumTotal([[-1],[2,3],[1,-1,-3]]) == -1
+        minimumTotal([[2],[3,4],[6,5,7],[4,1,8,3]])==11
+    }
+    
+}
+Solution120().test()
 
 class Solution350 {
     // sorted
@@ -57,7 +257,7 @@ class Solution {
         let n = prices.count
         
         for i in 0..<n {
-            let mx = max(
+//            let mx = max(
         }
     }
     
@@ -161,7 +361,7 @@ class Solution {
         "jesslookedjustliketimherbrother")==7
     }
 }
-Solution().test()
+//Solution().test()
 
 /**
  面试题 16.11. 跳水板
