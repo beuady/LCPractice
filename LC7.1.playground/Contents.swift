@@ -5,9 +5,91 @@ import UIKit
 //aword[index]
 
 /*
- 1466. 重新规划路线
+ 167. 两数之和 II - 输入有序数组
  */
 class Solution {
+    func twoSum(_ numbers: [Int], _ target: Int) -> [Int] {
+        // 有序，故可以用双指针，基于测量值和target的关系移动指针
+        let n = numbers.count
+        var l=0, r = n-1
+        while l < r {
+            
+            let sum = numbers[l] + numbers[r]
+            if sum == target {
+                return [l+1, r+1]
+            }else if sum < target {
+                l += 1
+            }else {
+                r -= 1
+            }
+            
+        }
+        return []
+    }
+    
+    func twoSum_binary(_ numbers: [Int], _ target: Int) -> [Int] {
+        let n = numbers.count
+        for i in 0..<n {
+            let p = target - numbers[i]
+            var l = 0, r = n - 1
+            while l < r {
+                let midI = (l+r)>>1
+                let mid = numbers[midI]
+                
+                if p == numbers[midI] {
+                    if midI == i {
+                        break
+                    }
+                    return i<midI ? [i+1, midI+1] : [midI+1, i+1]
+                }else if p < mid {
+                    r = midI
+                }else {
+                    l = midI+1
+                }
+            }
+        }
+        
+        
+        return []
+    }
+    
+    func test(){
+        twoSum([2,3,4],6)
+    }
+}
+Solution().test()
+
+/**
+ 97. 交错字符串
+ */
+class Solution97 {
+    func isInterleave(_ s1: String, _ s2: String, _ s3: String) -> Bool {
+        let S1 = Array(s1)
+        let S2 = Array(s2)
+        let S3 = Array(s3)
+        
+        var r = 0
+        
+        
+        
+        return false
+    }
+    func test1() {
+//        aadbbcbcac
+//        aab c c
+//        dbb b ac
+        isInterleave("aabcc",
+        "dbbca",
+        "aadbbcbcac")==true
+    }
+}
+Solution97().test1()
+
+
+/*
+ 1466. 重新规划路线
+ */
+class Solution1466 {
     
     func getroot(_ k:inout [Int], _ now:Int)->Int {
         if k[now] != now {
@@ -43,7 +125,7 @@ class Solution {
         [[4,3],[2,3],[1,2],[1,0]])==2
     }
 }
-Solution().test()
+Solution1466().test()
 
 /**
  35. 搜索插入位置
