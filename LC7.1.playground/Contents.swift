@@ -4,6 +4,167 @@ import UIKit
 //let index = aword.index(aword.startIndex, offsetBy: 2)
 //aword[index]
 
+
+/**
+ 329. 矩阵中的最长递增路径
+ */
+class Solution329 {
+    var ans = 0
+    var memo:[[Int]]!
+    var dirs = [[-1, 0], [1,0],[0, -1], [0, 1]]
+    func longestIncreasingPath(_ matrix: [[Int]]) -> Int {
+        let n = matrix.count
+        let m = matrix.first!.count
+        memo = [[Int]](repeating: [Int](repeating: 0, count: m), count: n)
+        for i in 0..<n {
+            for j in 0..<m {
+                ans = max(ans, dfs(matrix, i, j))
+            }
+        }
+        return ans
+    }
+    
+    func dfs(_ matrix: [[Int]], _ x:Int, _ y:Int)->Int {
+        if memo[x][y] != 0 {
+            return memo[x][y]
+        }
+        memo[x][y] += 1
+        
+        let n = matrix.count
+        let m = matrix.first!.count
+        
+        for dir in dirs {
+            let nx = x + dir[0]
+            let ny = y + dir[1]
+            if nx >= 0 && ny >= 0 && nx<=n && ny <= m &&
+                matrix[nx][ny] >  matrix[x][y] {
+                memo[x][y] = max(memo[x][y], )
+            }
+            
+        }
+
+        
+        return memo[x][y]
+    }
+    
+    func test(){
+        longestIncreasingPath([
+          [9,9,4],
+          [6,6,8],
+          [2,1,1]
+        ] ) == 4
+    }
+}
+Solution329().test()
+
+/**
+ 410. 分割数组的最大值
+ */
+class Solution {
+    
+    
+    func splitArray(_ nums: [Int], _ m: Int) -> Int {
+        var left = 0, right = 0
+        let n = nums.count
+        for i in 0..<n {
+            right += nums[i]
+            if left < nums[i] {
+                left = nums[i]
+            }
+        }
+        
+        while left < right {
+            let mid = (left+right)>>1
+            if check(nums, mid, m) {
+                right = mid
+            }else{
+                left = mid + 1
+            }
+        }
+        return left
+    }
+    func check(_ nums:[Int], _ x:Int, _ m:Int) -> Bool{
+        var sum = 0
+        var cnt = 1
+        let n = nums.count
+        for i in 0..<n {
+            if sum + nums[i] > x {
+                cnt += 1
+                sum = nums[i]
+            }else{
+                sum += nums[i]
+            }
+        }
+        
+        return cnt <= m
+    }
+    
+    func test(){
+        splitArray([7,2,5,10,8], 2) == 18
+    }
+}
+Solution().test()
+
+/**
+ 64. 最小路径和
+ */
+class Solution64 {
+    var dp:[[Int]]!
+    func dfs(_ grid:[[Int]],_ x:Int,_ y:Int) -> Int {
+        let m = grid.count, n = grid.first!.count
+        if x >= m || y >= n {
+            return Int.max
+        }
+        if dp[x][y] > 0 {
+            return dp[x][y]
+        }
+        if x==m-1 && y == n-1 {
+            return grid[x][y]
+        }
+        let r = dfs(grid, x, y+1)
+        let d = dfs(grid, x+1, y)
+        dp[x][y] = min(r, d) + grid[x][y]
+        return dp[x][y]
+    }
+    func minPathSum_dfs(_ grid: [[Int]]) -> Int {
+        let m = grid.count, n = grid.first!.count
+        dp = [[Int]](repeating: [Int](repeating: 0, count: n), count: m)
+        
+        return dfs(grid, 0, 0)
+    }
+    
+    func minPathSum_dp(_ grid: [[Int]]) -> Int {
+        let m = grid.count, n = grid.first!.count
+        var dp = [[Int]](repeating: [Int](repeating: 0, count: n), count: m)
+        
+        dp[0][0] = grid[0][0]
+        for i in 0..<m {
+            for j in 0..<n {
+                if i == 0 && j > 0 {
+                    dp[i][j] = dp[i][j-1] + grid[i][j]
+                }
+                if j == 0 && i > 0 {
+                    dp[i][j] = dp[i-1][j] + grid[i][j]
+                }
+                if j>0 && i > 0 {
+                    dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i][j]
+                }
+            }
+        }
+        
+        return dp[m-1][n-1]
+    }
+    
+    func test(){
+        minPathSum_dfs([
+          [1,3,1],
+          [1,5,1],
+          [4,2,1]
+        ])==7
+    }
+}
+Solution64().test()
+
 /*
  167. 两数之和 II - 输入有序数组
  */
