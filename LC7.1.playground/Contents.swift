@@ -3,6 +3,60 @@ import UIKit
 //let aword = String("abcd")
 //let index = aword.index(aword.startIndex, offsetBy: 2)
 //aword[index]
+/**
+ https://leetcode-cn.com/problems/xun-bao/
+ LCP 13. 寻宝
+ */
+class Solution13 {
+    func minimalSteps(_ maze: [String]) -> Int {
+        // S = 起点， (多)# 障碍, (多)O 石头,   (多)M 坑,   T 终点  (多). 表示可通行
+        // 如果M为空, 直接S->T
+        // 如果S->T没路， 则返回-1
+        // 如果有路，则返回|S->T| 的步数
+        // 如果不为空, 计算S->min(O),就是最近的O
+        // 重复计算O到所有的min(M)，就是最近的M,
+        // 这里有个注意点是, 下一个min(O)->min(M)怎样走，才能找到最终的min(M(last))->T，就是最后一个M到终点T
+        // 补充：记录每一步的步数，每一次迭代中，如果有障碍，则需要找出最短路径的步数
+        //
+        return 0
+    }
+}
+
+/**
+ 343. 整数拆分
+ */
+class Solution343 {
+        
+    /**
+     dp推导
+       设dp[i]为正整数i的最大乘积,从j数开始拆分，且 1<=j<i
+     则有 dp’[i] = max{ j * (i - j)}, 假设i-j的部分不可拆分
+     则有 dp‘[i] = max{ j * dp[i - j] }, i-j的部分可拆分
+     所有 dp[i] = max{ max{j*(i-j), j * dp[i-j]} } , 1<=j<i
+     
+     
+     */
+    func integerBreak(_ n: Int) -> Int {
+        var ans = 0
+        var dp = [Int](repeating: 0, count: n+1) // 拆分的范围是[0,n]，则是n+1个
+//        dp[0] = dp[1] = 0
+        for i in 2...n {//为了得到dp[n]前面的所有dp[i],
+            ans = 0
+            for j in 1..<i {
+                ans = max(ans, max( j*(i-j), j*dp[i-j]))
+            }
+            dp[i] = ans
+        }
+        
+        return dp[n]
+    }
+    
+    func test() {
+//        integerBreak(2)==1
+        integerBreak(10)==36
+    }
+}
+Solution343().test()
 
 
 /**
@@ -13,6 +67,9 @@ class Solution329 {
     var memo:[[Int]]!
     var dirs = [[-1, 0], [1,0],[0, -1], [0, 1]]
     func longestIncreasingPath(_ matrix: [[Int]]) -> Int {
+        if matrix.count == 0 || matrix.first?.count == 0 {
+            return 0
+        }
         let n = matrix.count
         let m = matrix.first!.count
         memo = [[Int]](repeating: [Int](repeating: 0, count: m), count: n)
@@ -36,14 +93,11 @@ class Solution329 {
         for dir in dirs {
             let nx = x + dir[0]
             let ny = y + dir[1]
-            if nx >= 0 && ny >= 0 && nx<=n && ny <= m &&
+            if nx >= 0 && ny >= 0 && nx<n && ny < m &&
                 matrix[nx][ny] >  matrix[x][y] {
-                memo[x][y] = max(memo[x][y], )
+                memo[x][y] = max(memo[x][y], dfs(matrix, nx, ny)+1)
             }
-            
         }
-
-        
         return memo[x][y]
     }
     
