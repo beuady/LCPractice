@@ -1,6 +1,262 @@
 import UIKit
 
-class Solution {
+/**
+ 336. 回文对
+ */
+
+class Solution336 {
+    var wordsRev = [[Character]]()
+    var indices = [String:Int]()
+    // 官方解法之字典记录逆向的回文
+    func palindromePairs(_ words: [String]) -> [[Int]] {
+        let n = words.count
+        for word in words {
+            wordsRev.append(word.reversed())
+        }
+        
+        for i in 0..<n {
+            indices[String(wordsRev[i])] = i
+        }
+        print("...")
+        var ans = [[Int]]()
+        for i in 0..<n {
+            let word = words[i]
+            let m = words[i].count
+            if m == 0 {
+                continue
+            }
+            let W = Array(word)
+            for j in 0...m {
+                if isPalindrome(W, j, m-1) {
+                    let leftId = findWord(W, 0, j-1)
+                    if leftId != -1 && leftId != i {
+                        ans.append([i, leftId])
+                    }
+                }
+                print("..z")
+                if j != 0 && isPalindrome(W, 0, j-1) {
+                    let rightId = findWord(W, j, m-1)
+                    if rightId != -1 && rightId != i {
+                        ans.append([rightId, i])
+                    }
+                }
+                
+            }
+            
+        }
+        return ans
+    }
+    
+    func isPalindrome(_ S:[Character], _ left:Int, _ right:Int)->Bool {
+        let len = right - left + 1
+        for i in 0 ..< len/2 {
+            if S[left + i] != S[right - i] {
+                return false
+            }
+        }
+        return true
+    }
+    
+    func findWord(_ S:[Character], _ left:Int, _ right:Int) -> Int {
+//        print("findword")
+        let i = indices[String(S[left..<right+1])] ?? -1
+//        print(i,"findword")
+        return i
+    }
+    
+    
+    func test(){
+        palindromePairs(["abcd","dcba","lls","s","sssll"])
+    }
+    
+}
+
+Solution336().test()
+
+
+
+class Solution336_暴力 {
+    
+    // 暴力解法O(n^2*M), 其中M是字符串的平均长度
+    func palindromePairs(_ words: [String]) -> [[Int]] {
+        var ans = [[Int]]()
+        if words.count==1 {
+            if check(words[0], "") {
+                return [[0]]
+            }else{
+                return ans
+            }
+        }
+        let n = words.count
+        for i in 0..<n {
+            for j in 0..<n {
+                if i != j {
+                    if check(words[i], words[j]) {
+                        ans.append([i,j])
+                    }
+                }
+            }
+        }
+        return ans
+    }
+    
+    func check(_ str1:String, _ str2:String)->Bool {
+        let S = str1+str2
+        let L = Array(S)
+        
+        
+        let n:Int = L.count
+        let m = n/2
+        for i in 0...m {
+            if L[i] != L[n-i-1] {
+                return false
+            }
+        }
+        
+        return true
+    }
+    
+    func test(){
+        palindromePairs(["abcd","dcba","lls","s","sssll"])
+    }
+    
+}
+
+
+
+
+/**
+ 337. 打家劫舍 III
+ */
+
+public class TreeNode {
+    public var val: Int
+    public var left: TreeNode?
+    public var right: TreeNode?
+    public init(_ val: Int) {
+        self.val = val
+        self.left = nil
+        self.right = nil
+    }
+}
+
+extension TreeNode:Hashable {
+    public static func == (lhs: TreeNode, rhs: TreeNode) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(val)
+        hasher.combine(left)
+        hasher.combine(right)
+    }
+}
+ 
+class Solution337 {
+    
+    //思路,  使用二元组，替代字典,还是动态规划
+    // f(o) = g(l)+g(r), g(o) = max{f(l),g(l)} + max{ g(r),f(r)}
+    
+    class Solution_dp_pair {
+        func rob(_ root: TreeNode?) -> Int {
+            let r = robNode(root)
+            return max(r.0,r.1)
+        }
+        
+        func robNode(_ node:TreeNode?) -> (Int, Int) {
+            if node == nil {
+                return (0,0)
+            }
+            
+            let l = robNode(node?.left)
+            let r = robNode(node?.right)
+            
+            var res:(Int,Int) // 二元组相当于 (g(o), f(o))
+            res.0 = max(l.0, l.1) + max(r.0, r.1)
+            res.1 = node!.val + l.0 + r.0
+            return res
+        }
+    }
+    
+    var f:[TreeNode:Int]!
+    var g:[TreeNode:Int]!
+    
+    func dfs(_ node:TreeNode?) {
+        if let n = node {
+            dfs(n.left)
+            dfs(n.right)
+            
+            f[n] = n.val
+            g[n] = 0
+//                + (n.left != nil ? (g[n.left!] ?? 0) : 0) + (n.right != nil ? (g[n.right!] ?? 0) : 0)
+            
+            if let r = n.right {
+                f[n]! += g[r] ?? 0
+                g[n]! += max(f[r] ?? 0,g[r] ?? 0)
+            }
+            if let l = n.left {
+                f[n]! += g[l] ?? 0
+                g[n]! = max(f[l] ?? 0,g[l] ?? 0)
+            }
+        }
+    }
+
+    func rob_dp_map(_ root: TreeNode?) -> Int {
+        if root == nil {
+            return 0
+        }
+        f = [TreeNode:Int]()
+        g = [TreeNode:Int]()
+        dfs(root)
+        return max(f[root!]!, g[root!]!)
+    }
+}
+Solution()
+
+/**
+ 207. 课程表
+ */
+class Solution207 {
+    var edges:[[Int]]!
+    var indeg:[Int]!
+    func canFinish(_ numCourses: Int, _ prerequisites: [[Int]]) -> Bool {
+        edges = [[Int]](repeating: [Int](), count: numCourses)
+        indeg = [Int](repeating: 0, count: numCourses)
+        
+        for info in prerequisites {
+            edges[info[1]].append(info[0])
+            indeg[info[0]] += 1
+        }
+        
+        var queue = [Int]()
+        for i in 0..<numCourses {
+            if indeg[i] == 0 {
+                queue.append(i) //记录入度为0的结点
+            }
+        }
+        
+        var cntVisited = 0 //记录访问的数量
+        while !queue.isEmpty {
+            cntVisited += 1
+            let u = queue.removeFirst()
+            for v in edges[u] {
+                indeg[v] -= 1
+                if indeg[v] == 0 {
+                    queue.append(v)
+                }
+            }
+        }
+        
+        return cntVisited == numCourses;
+        
+    }
+    func test(){
+        
+    }
+}
+Solution207().test()
+
+class Solution_ {
     func maxProfit(_ prices: [Int]) -> Int {
         var ans = 0
         var mP = Int.max
