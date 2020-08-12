@@ -1,5 +1,148 @@
 import UIKit
 
+let d:Character = "O"
+
+
+/**
+ 130. 被围绕的区域
+ */
+class Solution {
+    var n:Int!
+    var m:Int!
+    func dfs(_ board: inout [[Character]],_ x:Int, _ y:Int)
+    {
+        if x<0 || x>=n || y<0 || y>=m || board[x][y] != "O"  {
+            return
+        }
+        board[x][y] = "A"
+        dfs(&board, x+1, y)
+        dfs(&board, x-1, y)
+        dfs(&board, x, y+1)
+        dfs(&board, x, y-1)
+
+    }
+    
+    func solve(_ board: inout [[Character]]) {
+        if board.count == 0 {
+            return
+        }
+        n = board.count
+        m = board.first!.count
+        
+        for i in 0..<n {
+            dfs(&board, i, 0)
+            dfs(&board, i, m-1)
+        }
+        
+        for i in 0..<m-1 {
+            dfs(&board, 0, i)
+            dfs(&board, n-1, i)
+        }
+        
+        for i in 0..<n {
+            for j in 0..<m {
+                if board[i][j] == "A" {
+                    board[i][j] = "O"
+                }else if board[i][j] == "O" {
+                    board[i][j] = "X"
+                }
+            }
+        }
+        
+    }
+    /**
+     被围绕的区间不会存在于边界上，换句话说，任何边界上的 'O' 都不会被填充为 'X'。 任何不在边界上，或不与边界上的 'O' 相连的 'O' 最终都会被填充为 'X'。如果两个元素在水平或垂直方向相邻，则称它们是“相连”的。
+
+     */
+    func test(){
+        var b = tran([
+            ["O","X","X","O","X"],
+            ["X","O","O","X","O"],
+            ["X","O","X","O","X"],
+            ["O","X","O","O","O"],
+            ["X","X","O","X","O"]])
+        
+        /*  [
+             ["O","X","X","O","X"],
+             ["X","X","X","X","O"],
+             ["X","X","X","O","X"],
+             ["O","X","O","O","O"],
+             ["X","X","O","X","O"]]
+        */
+        solve(&b)
+        print(b)
+    }
+    func tran(_ board: [[String]]) -> [[Character]] {
+        let n = board.count
+        let m = board.first!.count
+        var T = [[Character]](repeating: [Character](repeating: "X", count: m), count: n)
+        if board.count != 0 {
+            for i in 0..<n {
+                for j in 0..<m {
+                    T[i][j] = Character(board[i][j])
+                }
+            }
+        }
+        return T
+    }
+    
+}
+Solution().test()
+
+/**
+ 696. 计数二进制子串
+ */
+class Solution696 {
+    func countBinarySubstrings(_ s: String) -> Int {
+        //压缩
+        var counts = [Int]()
+        let S = Array(s)
+        var pr = 0, n = S.count
+//        s= "000011110011" = 4422
+        while pr < n {
+            let c = S[pr]
+            var count = 0
+            while  pr<n && c == S[pr] {
+                pr += 1
+                count += 1
+            }
+            counts.append(count)
+        }
+        print("...")
+        var ans = 0
+        
+        for i in 1..<counts.count {
+            ans += min(counts[i], counts[i-1])
+        }
+        
+        return ans
+        
+    }
+    
+    func test(){
+        countBinarySubstrings("00110")
+    }
+}
+Solution696().test()
+
+/**
+ 93. 复原IP地址
+ */
+class Solution {
+    func restoreIpAddresses(_ s: String) -> [String] {
+        let S = Array(s)
+        let n = S.count
+        var ans = [String]()
+        var dotIndexs = [Int]()
+        for i in 0..<n {
+            
+            
+            
+        }
+        return ans
+    }
+}
+
 /**
  336. 回文对
  */
