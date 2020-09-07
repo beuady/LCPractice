@@ -1,7 +1,320 @@
 import UIKit
 
-let d:Character = "O"
+/**
+ 
+ */
+class Solution657 {
+    func judgeCircle(_ moves: String) -> Bool {
+        
+    }
+}
 
+/**
+ 递增子序列
+ */
+class Solution491 {
+    var temp:[Int]!
+    var ans:[[Int]]!
+    
+    func dfs(_ cur:Int, _ last:Int, nums:[Int]) {
+        
+    }
+    
+    func findSubsequences(_ nums: [Int]) -> [[Int]] {
+        
+    }
+}
+
+/**
+ 459. 重复的子字符串
+ */
+class Solution459 {
+    func repeatedSubstringPattern(_ s: String) -> Bool {
+        let S = Array(s)
+        let n = S.count
+        var i = 1
+        while i*2 <= n {
+            
+            if n % i == 0 {
+                var match = true
+                for j in i..<n {
+                    if S[j] != S[j-i] {
+                        match = false
+                        break
+                    }
+                }
+                
+                if match {
+                    return true
+                }
+                
+            }
+            
+            i += 1
+        }
+        return false
+    }
+    
+    func test(){
+        repeatedSubstringPattern("babbabbabbabbab")==true
+    }
+    
+}
+Solution459().test()
+
+/**
+ 647. 回文子串
+ */
+class Solution647 {
+    func countSubstrings(_ s: String) -> Int {
+        
+        let n = s.count
+        var ans = 0
+        let S = Array(s)
+        
+        for i in 0..<2*n-1 {
+            var l:Int = i / 2
+            var r:Int = i / 2 + i % 2
+            while l >= 0 && r < n && S[l] == S[r] {
+                l -= 1
+                r += 1
+                ans += 1
+            }
+        }
+        
+        return ans
+    }
+//    func countSubstrings(_ s: String) -> Int {
+//        let S = Array(s)
+//        let n = S.count
+//        var l = 0, r = 0
+//        while r < n {
+//            while l<=r && check(l,r) {
+//
+//                l += 1
+//            }
+//            r += 1
+//        }
+//
+//    }
+    
+    func check(_ l:Int ,_ r:Int)->Bool {
+        
+        
+        
+    }
+    
+}
+
+//有序链表转换二叉搜索树
+public class ListNode {
+    public var val: Int
+    public var next: ListNode?
+    public init() { self.val = 0; self.next = nil; }
+    public init(_ val: Int) { self.val = val; self.next = nil; }
+    public init(_ val: Int, _ next: ListNode?) { self.val = val; self.next = next; }
+}
+ 
+public class TreeNode {
+    public var val: Int
+    public var left: TreeNode?
+    public var right: TreeNode?
+    public init() { self.val = 0; self.left = nil; self.right = nil; }
+    public init(_ val: Int) { self.val = val; self.left = nil; self.right = nil; }
+    public init(_ val: Int, _ left: TreeNode?, _ right: TreeNode?) {
+        self.val = val
+        self.left = left
+        self.right = right
+    }
+}
+
+
+extension ListNode:Hashable {
+    public static func == (lhs: ListNode, rhs: ListNode) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(val)
+        hasher.combine(next)
+    }
+}
+
+/**
+ 111. 二叉树的最小深度
+ */
+class Solution111 {
+    var minD = Int.max
+    func minDepth(_ root: TreeNode?) -> Int {
+        if root == nil {
+            return 0
+        }
+        
+        if root?.left == nil && root?.right == nil {
+            return 1
+        }
+        
+        if let l = root?.left {
+            minD = min(minD, minDepth(l))
+        }
+        
+        if let r = root?.right {
+            minD = min(minD, minDepth(r))
+        }
+        
+        return minD + 1
+    }
+}
+
+/**
+ 有序链表转换二叉搜索树
+ */
+class Solution109 {
+    func sortedListToBST(_ head: ListNode?) -> TreeNode? {
+        guard let _ = head else {
+            return nil
+        }
+        var cur = head
+        var nums = [Int]()
+        while cur != nil {
+            nums.append(cur!.val)
+            cur = cur?.next
+        }
+        return buildTree(nums, 0, nums.count - 1)
+    }
+    
+    func buildTree(_ nums:[Int], _ left:Int, _ right:Int)->TreeNode? {
+        if left < right {
+            return nil
+        }
+        let mid = (left+right)>>1
+        let node = TreeNode(nums[mid])
+        node.left = buildTree(nums, left, mid-1)
+        node.right = buildTree(nums, mid+1, right)
+        return node
+    }
+    
+    func findMid(_ left:ListNode?, _ right:ListNode?) -> ListNode? {
+        var slow:ListNode? = left
+        var fast:ListNode? = left
+        while fast != right && fast?.next != right {
+            slow = slow?.next
+            fast = fast?.next?.next
+        }
+        return slow
+    }
+    
+    func buildT(_ left:ListNode?, _ right:ListNode?)->TreeNode? {
+        if left == right {
+            return nil
+        }
+        let mid:ListNode? = findMid(left, right)
+        
+        let node:TreeNode? = mid != nil ? TreeNode(mid!.val) : nil
+        node?.left = buildT(left, mid)
+        node?.right = buildT(mid?.next, right)
+        return node
+    }
+    
+    
+}
+
+//Solution().test()
+
+/**
+  图像渲染
+ */
+class Solution733 {
+    let dx = [1, 0, 0, -1]
+    let dy = [0, 1, -1, 0]
+    func floodFill(_ image: [[Int]], _ sr: Int, _ sc: Int, _ newColor: Int) -> [[Int]] {
+        var curC = image[sr][sc]
+        if curC == newColor {
+            return image
+        }
+        var image = image
+        let n = image.count, m = image.first!.count
+        var queue = [(Int, Int)]()
+        queue.append((sr, sc))
+        image[sr][sc] = newColor
+        while !queue.isEmpty {
+            let x = queue.last!.0, y = queue.last!.1
+            queue.removeLast()
+            for i in 0..<4 {
+                let mx = x + dx[i], my = y + dy[i]
+                if mx >= 0 && mx < n && my >= 0 && my < m && image[mx][my] == curC {
+                    queue.append((mx, my))
+                    image[mx][my] = newColor
+                }
+            }
+        }
+        return image
+    }
+}
+
+public class Node {
+    public var val: Int
+    public var neighbors: [Node?]
+    public init(_ val: Int) {
+        self.val = val
+        self.neighbors = []
+    }
+}
+
+class Solution {
+    func cloneGraph(_ node: Node?) -> Node? {
+        
+    }
+}
+
+/**
+ 20. 有效的括号
+ */
+class Solution20 {
+    func isValid(_ s: String) -> Bool {
+        let map:[Character:Character] = [")":"(", "}":"{","]":"["]
+        print(map)
+        var stack = [Character]()
+        
+        if s.count % 2 == 1 {
+            return false
+        }
+        
+        for ch in s {
+            stack.append(ch)
+            if !stack.isEmpty && stack.count>1 {
+                let top = stack.last!
+                if stack[stack.count-2] == map[top] {
+                    stack.removeLast()
+                    stack.removeLast()
+                }
+            }
+        }
+        
+//        print(stack)
+        return stack.count == 0
+    }
+    
+    func test(){
+        isValid("()[]{}")
+        isValid("{[]}")
+    }
+}
+Solution20().test()
+
+/**
+ 43. 字符串相乘
+ */
+class Solution43 {
+    func multiply(_ num1: String, _ num2: String) -> String {
+        let N1 = Array(num1)
+        let N2 = Array(num2)
+        
+        
+        
+        
+    }
+}
 
 /**
  130. 被围绕的区域
@@ -272,16 +585,16 @@ class Solution336_暴力 {
  337. 打家劫舍 III
  */
 
-public class TreeNode {
-    public var val: Int
-    public var left: TreeNode?
-    public var right: TreeNode?
-    public init(_ val: Int) {
-        self.val = val
-        self.left = nil
-        self.right = nil
-    }
-}
+//public class TreeNode {
+//    public var val: Int
+//    public var left: TreeNode?
+//    public var right: TreeNode?
+//    public init(_ val: Int) {
+//        self.val = val
+//        self.left = nil
+//        self.right = nil
+//    }
+//}
 
 extension TreeNode:Hashable {
     public static func == (lhs: TreeNode, rhs: TreeNode) -> Bool {
