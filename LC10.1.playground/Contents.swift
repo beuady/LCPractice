@@ -1,5 +1,170 @@
 import UIKit
 
+let char:Character = "a"
+char.asciiValue
+
+let c = "@123123"
+
+
+/// 763. 划分字母区间
+class Solution763 {
+    func partitionLabels(_ S: String) -> [Int] {
+        var last = [Int](repeating: 0, count: 26)
+        let SS = Array(S)
+        let n = S.count
+        let a:UInt8 = Character("a").asciiValue!
+        for i in 0..<n {
+            let char = SS[i]
+            last[Int(char.asciiValue!-a)] = i
+        }
+        
+        var par = [Int]()
+        var start = 0, end = 0
+        for i in 0..<n {
+            let cn = SS[i].asciiValue!
+            end = max(end, last[Int(cn-a)])
+            if i == end {
+                par.append(end-start+1)
+                start = end + 1
+            }
+        }
+        return par
+    }
+}
+
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     public var val: Int
+ *     public var next: ListNode?
+ *     public init(_ val: Int) {
+ *         self.val = val
+ *         self.next = nil
+ *     }
+ * }
+ */
+class Solution234 {
+    func isPalindrome(_ head: ListNode?) -> Bool {
+        var stack = [Int]()
+        var cur = head
+        while cur != nil {
+            stack.append(cur!.val)
+        }
+        return stack == stack.reversed()
+    }
+}
+
+class Solution925 {
+    func isLongPressedName(_ name: String, _ typed: String) -> Bool {
+        let N = Array(name)
+        let T = Array(typed)
+        let TCount = T.count
+        var nIndex = 0
+        var tIndex = 0
+        while tIndex < TCount {
+            if nIndex < N.count && N[nIndex] == T[tIndex] {
+                nIndex += 1
+            }else if tIndex>0 && T[tIndex] == T[tIndex-1] {
+                
+            }else{
+                return false
+            }
+            
+            tIndex += 1
+        }
+        return nIndex == N.count
+    }
+    func test(){
+        isLongPressedName("alex",
+                          "alexxr") == false
+    }
+}
+Solution925().test()
+
+ public class ListNode {
+     public var val: Int
+     public var next: ListNode?
+     public init() { self.val = 0; self.next = nil; }
+     public init(_ val: Int) { self.val = val; self.next = nil; }
+     public init(_ val: Int, _ next: ListNode?) { self.val = val; self.next = next; }
+ }
+
+class Solution19 {
+    
+    func removeNthFromEnd(_ head: ListNode?, _ n: Int) -> ListNode? {
+        let dummy = ListNode(0, head)
+        var stack = [ListNode]()
+        var cur:ListNode? = dummy
+        while cur != nil {
+            stack.append(cur!)
+            cur = cur?.next
+        }
+        
+        for i in 0..<n {
+            stack.removeLast()
+        }
+        
+        let prev = stack.last
+        prev?.next = prev?.next?.next
+        let ans = dummy.next
+        dummy.next = nil
+        return ans
+    }
+    
+    // 失败逻辑
+    func removeNthFromEnd_fail(_ head: ListNode?, _ n: Int) -> ListNode? {
+        var h1 = head
+        var h2 = head
+        var i = 0
+        while h2?.next != nil && i+1<=n {
+            if i < n-1 {
+                h1 = h1?.next
+            }
+            h2 = h2?.next
+            i += 1
+        }
+        return h1
+    }
+}
+
+class Solution844 {
+    func backspaceCompare(_ S: String, _ T: String) -> Bool {
+        let s = Array(S)
+        let t = Array(T)
+        
+        var stack = [Character]()
+        var stack2 = [Character]()
+        for c in s {
+            if c != "#" {
+                stack.append(c)
+            }else{
+                if !stack.isEmpty {
+                    stack.removeLast()
+                }
+            }
+        }
+        
+        for c in t {
+            if c != "#" {
+                stack2.append(c)
+            }else{
+                if !stack2.isEmpty {
+                    stack2.removeLast()
+                }
+            }
+        }
+        
+        
+        
+        return String(stack)==String(stack2)
+    }
+    
+    func test(){
+        backspaceCompare("ab#c", "ad#c") == true
+    }
+}
+Solution844().test()
+
 class Solution18 {
     //排序+双指针
     func fourSum(_ nums: [Int], _ target: Int) -> [[Int]] {
