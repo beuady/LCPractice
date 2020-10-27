@@ -1,10 +1,66 @@
 import UIKit
 
-let char:Character = "a"
-char.asciiValue
 
-let c = "@123123"
+ public class TreeNode {
+     public var val: Int
+     public var left: TreeNode?
+     public var right: TreeNode?
+     public init() { self.val = 0; self.left = nil; self.right = nil; }
+     public init(_ val: Int) { self.val = val; self.left = nil; self.right = nil; }
+     public init(_ val: Int, _ left: TreeNode?, _ right: TreeNode?) {
+         self.val = val
+         self.left = left
+         self.right = right
+     }
+ }
+ 
+//  二叉树的前序遍历
+class Solution144 {
+    var list = [Int]()
+    func preorderTraversal(_ root: TreeNode?) -> [Int] {
+        helper(root)
+        return list
+    }
+    
+    func helper(_ node:TreeNode?) {
+        if node == nil {
+            return
+        }
+        
+        list.append(node!.val)
+        helper(node?.left)
+        helper(node?.right)
+    }
+}
 
+// 1365. 有多少小于当前数字的数字
+class Solution1365 {
+    /**
+     注意到数组元素的值域为 [0,100][0,100]，所以可以考虑建立一个频次数组 cntcnt ，cnt[i]cnt[i] 表示数字 ii 出现的次数。那么对于数字 ii 而言，小于它的数目就为 cnt[0...i-1]cnt[0...i−1] 的总和
+
+     作者：LeetCode-Solution
+     链接：https://leetcode-cn.com/problems/how-many-numbers-are-smaller-than-the-current-number/solution/you-duo-shao-xiao-yu-dang-qian-shu-zi-de-shu-zi--2/
+     来源：力扣（LeetCode）
+     著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+     */
+    func smallerNumbersThanCurrent(_ nums: [Int]) -> [Int] {
+        var cnt = [Int](repeating: 0, count: 101)
+        let n = nums.count
+        for i in 0..<n{
+            cnt[nums[i]] += 1
+        }
+        
+        for i in 1...100 {
+            cnt[i] = cnt[i] + cnt[i-1]
+        }
+        
+        var res = [Int]()
+        for i in 0..<n {
+            res.append(nums[i] == 0 ? 0 : cnt[nums[i]-1])
+        }
+        return res
+    }
+}
 
 /// 763. 划分字母区间
 class Solution763 {
@@ -33,15 +89,15 @@ class Solution763 {
 }
 
 /**
- * Definition for singly-linked list.
- * public class ListNode {
- *     public var val: Int
- *     public var next: ListNode?
- *     public init(_ val: Int) {
- *         self.val = val
- *         self.next = nil
- *     }
- * }
+ Definition for singly-linked list.
+ public class ListNode {
+     public var val: Int
+     public var next: ListNode?
+     public init(_ val: Int) {
+         self.val = val
+         self.next = nil
+     }
+ }
  */
 class Solution234 {
     func isPalindrome(_ head: ListNode?) -> Bool {
