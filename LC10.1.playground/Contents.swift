@@ -1,5 +1,82 @@
 import UIKit
 
+// 463. 岛屿的周长
+class Solution463 {
+    
+    func islandPerimeter(_ grid: [[Int]]) -> Int {
+        let n = grid.count, m = grid.first!.count
+        var ans = 0
+        for i in 0..<n {
+            for j in 0..<m {
+                if grid[i][j] == 1 {
+                    ans += sumEdge(grid, i, j)
+                }
+            }
+        }
+        return ans
+    }
+    
+    func sumEdge(_ grid:[[Int]], _ i:Int, _ j:Int) -> Int {
+        var sum = 0
+        
+        // top
+        if i - 1 >= 0 && grid[i-1][j] == 0 {
+            sum += 1
+        }
+        if i + 1 <= grid.count-1 && grid[i+1][j] == 0 {
+            sum += 1
+        }
+        
+        if j - 1 >= 0 && grid[i][j-1] == 0 {
+            sum += 1
+        }
+        if j + 1 <= grid.first!.count-1 && grid[i][j+1] == 0 {
+            sum += 1
+        }
+        
+        if i == 0 {
+            sum += 1
+        }
+        if i == grid.count - 1 {
+            sum += 1
+        }
+        
+        if j == 0 {
+            sum += 1
+        }
+        if j == grid.first!.count - 1 {
+            sum += 1
+        }
+        return sum
+    }
+    
+    
+
+}
+
+//1207. 独一无二的出现次数
+class Solution1207 {
+    func uniqueOccurrences(_ arr: [Int]) -> Bool {
+        var list = [Int:Int]()
+        for num in arr {
+            list[num] = (list[num] ?? 0) + 1
+        }
+//        print(list[1],list[2],list[3])
+        var sets = Set<Int>()
+        for (_,cnt) in list {
+            if sets.contains(cnt){
+                return false
+            }
+            sets.insert(cnt)
+        }
+        return true
+    }
+    
+    func test() {
+        uniqueOccurrences([1,2,2,1,1,3]) == true
+    }
+}
+Solution1207().test()
 
  public class TreeNode {
      public var val: Int
